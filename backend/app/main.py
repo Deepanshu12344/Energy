@@ -76,10 +76,19 @@ def favicon():
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
+# Helper to ensure error responses always include CORS headers
+def _cors_headers(request: Request) -> dict[str, str]:
+    """Mirror request origin so the browser receives clean JSON errors instead of CORS NetworkError."""
+    origin = request.headers.get("origin")
+    if origin:
+        return {"Access-Control-Allow-Origin": origin, "Vary": "Origin"}
+    return {}
+
+
 # Exception Handlers
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-    """Format Pydantic request validation errors into standard ErrorResponse."""
+    """Format Pydantic request validation errors into standard ErrorResponse with CORS headers."""
     error_details = []
     for err in exc.errors():
         field_path = " -> ".join(str(loc) for loc in err.get("loc", []))
@@ -93,12 +102,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             detail="; ".join(error_details),
             status_code=status.HTTP_400_BAD_REQUEST,
         ).model_dump(),
+        headers=_cors_headers(request),
     )
 
 
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError) -> JSONResponse:
-    """Handle ValueErrors as 400 Bad Request."""
+    """Handle ValueErrors as 400 Bad Request with CORS headers."""
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content=ErrorResponse(
@@ -106,12 +116,13 @@ async def value_error_handler(request: Request, exc: ValueError) -> JSONResponse
             detail=str(exc),
             status_code=status.HTTP_400_BAD_REQUEST,
         ).model_dump(),
+        headers=_cors_headers(request),
     )
 
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
-    """Format HTTPExceptions into standard ErrorResponse."""
+    """Format HTTPExceptions into standard ErrorResponse with CORS headers."""
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(
@@ -119,12 +130,13 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
             detail=str(exc.detail),
             status_code=exc.status_code,
         ).model_dump(),
+        headers=_cors_headers(request),
     )
 
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    """Format unhandled server exceptions into 500 ErrorResponse."""
+    """Format unhandled server exceptions into 500 ErrorResponse with CORS headers."""
     logger.error("Unhandled exception: %s", exc, exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -133,4 +145,5 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
             detail="An internal server error occurred.",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         ).model_dump(),
+        headers=_cors_headers(request),
     )
