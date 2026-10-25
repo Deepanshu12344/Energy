@@ -62,8 +62,12 @@ export const apiClient = {
   },
 
   async getForecast(deliveryDate: string, cutoffTime?: string): Promise<ForecastComparisonResponse> {
-    const params = new URLSearchParams({ delivery_date: deliveryDate });
+    const params = new URLSearchParams({
+      date: deliveryDate,
+      delivery_date: deliveryDate,
+    });
     if (cutoffTime) {
+      params.append('cutoff', cutoffTime);
       params.append('cutoff_time', cutoffTime);
     }
     const res = await fetch(`${BASE_URL}/forecast?${params.toString()}`);
@@ -72,10 +76,13 @@ export const apiClient = {
 
   async getMetrics(startDate: string, endDate: string, cutoffTime?: string): Promise<MetricsResponse> {
     const params = new URLSearchParams({
+      start: startDate,
       start_date: startDate,
+      end: endDate,
       end_date: endDate,
     });
     if (cutoffTime) {
+      params.append('cutoff', cutoffTime);
       params.append('cutoff_time', cutoffTime);
     }
     const res = await fetch(`${BASE_URL}/metrics?${params.toString()}`);
@@ -84,10 +91,13 @@ export const apiClient = {
 
   async getErrorByHour(startDate: string, endDate: string, cutoffTime?: string): Promise<ErrorByHourResponse> {
     const params = new URLSearchParams({
+      start: startDate,
       start_date: startDate,
+      end: endDate,
       end_date: endDate,
     });
     if (cutoffTime) {
+      params.append('cutoff', cutoffTime);
       params.append('cutoff_time', cutoffTime);
     }
     const res = await fetch(`${BASE_URL}/error-by-hour?${params.toString()}`);
@@ -96,7 +106,9 @@ export const apiClient = {
 
   async getHorizonAnalysis(startDate: string, endDate: string): Promise<HorizonAnalysisResponse> {
     const params = new URLSearchParams({
+      start: startDate,
       start_date: startDate,
+      end: endDate,
       end_date: endDate,
     });
     const res = await fetch(`${BASE_URL}/horizon-analysis?${params.toString()}`);
@@ -110,11 +122,14 @@ export const apiClient = {
     numBins: number = 10
   ): Promise<ErrorDistributionResponse> {
     const params = new URLSearchParams({
+      start: startDate,
       start_date: startDate,
+      end: endDate,
       end_date: endDate,
       num_bins: numBins.toString(),
     });
     if (cutoffTime) {
+      params.append('cutoff', cutoffTime);
       params.append('cutoff_time', cutoffTime);
     }
     const res = await fetch(`${BASE_URL}/error-distribution?${params.toString()}`);
