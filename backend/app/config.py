@@ -18,9 +18,27 @@ class Settings:
         self.DEFAULT_GATE_CLOSURE_TIME: str = os.getenv("DEFAULT_GATE_CLOSURE_TIME", "12:00")
         self.APP_TIMEZONE: str = os.getenv("APP_TIMEZONE", "Europe/London")
         
-        # Parse CORS origins
-        raw_cors = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173")
-        self.CORS_ORIGINS: List[str] = [origin.strip() for origin in raw_cors.split(",") if origin.strip()]
+        # Parse and sanitize CORS origins: strip spaces, quotes, and trailing slashes
+        raw_cors = os.getenv("CORS_ORIGINS", "")
+        cleaned_origins: List[str] = []
+        for origin in raw_cors.split(","):
+            cleaned = origin.strip().strip("'\"").rstrip("/")
+            if cleaned:
+                cleaned_origins.append(cleaned)
+
+        # Always include standard local development origins
+        default_dev_origins = [
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:3000",
+        ]
+        if "*" not in cleaned_origins:
+            for dev in default_dev_origins:
+                if dev not in cleaned_origins:
+                    cleaned_origins.append(dev)
+
+        self.CORS_ORIGINS: List[str] = cleaned_origins
 
     def validate(self) -> None:
         """Validate critical configuration settings."""

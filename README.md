@@ -316,9 +316,11 @@ The project is structured for clean two-project deployment on Vercel:
 
 ### Step 3: Lock Down CORS on the Backend
 1. Go back to your `energy-wind-backend` project settings on Vercel -> **Environment Variables**.
-2. Update `CORS_ORIGINS` to your production frontend URL:
+2. Set or update `CORS_ORIGINS` to your production frontend URL (or `*` for public access):
    `https://energy-wind-frontend.vercel.app`
-3. Redeploy the backend (*Deployments -> click latest deployment -> Redeploy*) to apply the strict CORS policy.
+   *(Note: The backend automatically sanitizes trailing slashes, trims whitespace/quotes, and includes built-in regex matching for all `https://*.vercel.app` preview/branch deployments and `http://localhost:*`)*.
+3. Verify that `DATABASE_URL` in Vercel uses the **Transaction Pooler** port **6543** (`...pooler.supabase.com:6543/postgres`) to avoid serverless connection exhaustion (`EMAXCONNSESSION`).
+4. Redeploy the backend (*Deployments -> click latest deployment -> Redeploy*) to apply the updated environment variables.
 
 ---
 

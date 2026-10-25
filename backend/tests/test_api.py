@@ -162,3 +162,43 @@ def test_missing_required_params(test_client: TestClient):
     assert resp.status_code == 400
     data = resp.json()
     assert data["error"] == "VALIDATION_ERROR"
+
+
+def test_cors_preflight_and_simple_request_for_vercel_and_localhost(test_client: TestClient):
+    """Test that Vercel preview/production domains and localhost pass CORS preflight and get allow-origin headers."""
+    # Test Vercel domain preflight
+    res_opt = test_client.options(
+        "/api/health",
+        headers={
+            "Origin": "https://energy-wind-frontend.vercel.app",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert res_opt.status_code == 200
+    assert res_opt.headers.get("access-control-allow-origin") == "https://energy-wind-frontend.vercel.app"
+
+    # Test Vercel domain simple GET
+    res_get = test_client.get(
+        "/api/health",
+        headers={"Origin": "https://energy-wind-frontend.vercel.app"},
+    )
+    assert res_get.status_code == 200
+    assert res_get.headers.get("access-control-allow-origin") == "https://energy-wind-frontend.vercel.app"
+
+    # Test Localhost simple GET
+    res_local = test_client.get(
+        "/api/health",
+        headers={"Origin": "http://localhost:5173"},
+    )
+    assert res_local.status_code == 200
+    assert res_local.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+    # Test disallowed origin preflight returns 400
+    res_bad = test_client.options(
+        "/api/health",
+        headers={
+            "Origin": "https://unauthorized-domain.com",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert res_bad.status_code == 400

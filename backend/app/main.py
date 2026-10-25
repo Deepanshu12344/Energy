@@ -44,10 +44,13 @@ app = FastAPI(
 )
 
 # CORS Middleware
+# Allow explicit origins from settings, all *.vercel.app preview & production domains and local origins via regex,
+# and disable allow_credentials because this public analytics API uses no auth cookies or sessions.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS if settings.CORS_ORIGINS else ["*"],
-    allow_credentials=True,
+    allow_origin_regex=r"^(https://.*\.vercel\.app|http://(localhost|127\.0\.0\.1)(:\d+)?)$",
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
