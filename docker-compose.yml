@@ -1,0 +1,40 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: energy-wind-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000}
+      - DEFAULT_GATE_CLOSURE_TIME=${DEFAULT_GATE_CLOSURE_TIME:-12:00}
+      - TIMEZONE=${TIMEZONE:-Europe/London}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request, sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health', timeout=3).getcode() == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000/api}
+    container_name: energy-wind-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:5173/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
