@@ -52,7 +52,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
         </div>
         <div className="flex items-center justify-between gap-4">
           <span className="text-slate-500 dark:text-[#A3A3A3]">Mean Bias:</span>
-          <strong className="text-[#0B8FE3]">
+          <strong className={d.bias > 0 ? 'text-amber-500' : 'text-[#0B8FE3]'}>
             {d.bias > 0 ? `+${d.bias.toLocaleString()}` : d.bias.toLocaleString()} MW
           </strong>
         </div>

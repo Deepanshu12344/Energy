@@ -50,7 +50,7 @@ const OverUnderPiePanelComponent: React.FC<OverUnderPiePanelProps> = ({ isPrevie
               of hours over-forecast
             </span>
           </div>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-[#0B8FE3] dark:text-[#86C5EE] border border-blue-200/80 dark:border-blue-800/50 uppercase tracking-wider">
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 uppercase tracking-wider">
             Over-forecast
           </span>
         </div>
@@ -61,13 +61,13 @@ const OverUnderPiePanelComponent: React.FC<OverUnderPiePanelProps> = ({ isPrevie
         )}
       </div>
 
-      {/* Middle: Single Horizontal Split Bar (Two Blue Tones) */}
+      {/* Middle: Single Horizontal Split Bar */}
       <div className="my-auto py-2">
         <div className="relative w-full h-10 sm:h-12 bg-slate-100 dark:bg-[#1A1A1A] rounded-xl overflow-hidden flex border border-slate-200/80 dark:border-[#2A2A2A] shadow-inner">
-          {/* Over-forecast segment (Primary Blue #0B8FE3) */}
+          {/* Over-forecast segment (Amber) */}
           <div
             style={{ width: `${Math.max(overPct, 1)}%` }}
-            className="h-full bg-[#0B8FE3] hover:bg-[#097ec9] transition-all flex items-center justify-center px-2 text-white overflow-hidden group relative"
+            className="h-full bg-amber-500 hover:bg-amber-400 transition-all flex items-center justify-center px-2 text-white overflow-hidden group relative"
             title={`Over-forecast: ${overPct}% (${overCount} hrs)`}
           >
             {!isOverSmall ? (
@@ -80,16 +80,16 @@ const OverUnderPiePanelComponent: React.FC<OverUnderPiePanelProps> = ({ isPrevie
             ) : null}
           </div>
 
-          {/* Under-forecast segment (Secondary Lighter Blue #86C5EE) */}
+          {/* Under-forecast segment (Blue) */}
           <div
             style={{ width: `${Math.max(underPct, 1)}%` }}
-            className="h-full bg-[#86C5EE] hover:bg-[#74b6df] transition-all flex items-center justify-center px-2 text-slate-900 overflow-hidden group relative"
+            className="h-full bg-[#0B8FE3] hover:bg-[#097ec9] transition-all flex items-center justify-center px-2 text-white overflow-hidden group relative"
             title={`Under-forecast: ${underPct}% (${underCount} hrs)`}
           >
             {!isUnderSmall ? (
-              <div className="flex items-center gap-1.5 text-xs font-bold whitespace-nowrap drop-shadow-sm text-slate-900">
+              <div className="flex items-center gap-1.5 text-xs font-bold whitespace-nowrap drop-shadow-sm">
                 <span>{underPct}%</span>
-                <span className="text-[10px] font-medium opacity-90 hidden sm:inline text-slate-800">
+                <span className="text-[10px] font-medium opacity-90 hidden sm:inline">
                   ({underCount.toLocaleString()}h)
                 </span>
               </div>
@@ -101,7 +101,7 @@ const OverUnderPiePanelComponent: React.FC<OverUnderPiePanelProps> = ({ isPrevie
         {(isOverSmall || isUnderSmall) && (
           <div className="flex justify-between text-[11px] text-slate-500 dark:text-[#A3A3A3] mt-1.5 px-1 font-medium">
             {isOverSmall && (
-              <span className="text-[#0B8FE3] dark:text-[#86C5EE] font-semibold">
+              <span className="text-amber-600 dark:text-amber-400 font-semibold">
                 Over: {overPct}% ({overCount}h)
               </span>
             )}
@@ -117,9 +117,9 @@ const OverUnderPiePanelComponent: React.FC<OverUnderPiePanelProps> = ({ isPrevie
       {/* Bottom: Clean Legend with Swatches, Counts, and Percentages */}
       <div className="pt-2 border-t border-slate-100 dark:border-[#2A2A2A] grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
         {/* Over-forecast Legend Item */}
-        <div className="flex items-center justify-between p-2 rounded-lg bg-blue-50/70 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/30">
+        <div className="flex items-center justify-between p-2 rounded-lg bg-amber-50/60 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="w-3 h-3 rounded-sm bg-[#0B8FE3] shrink-0" />
+            <span className="w-3 h-3 rounded-sm bg-amber-500 shrink-0" />
             <span className="font-medium text-slate-700 dark:text-[#D4D4D4] truncate">
               Over-forecast <span className="text-[11px] text-slate-400 dark:text-[#737373]">(actual &lt; forecast)</span>
             </span>
@@ -131,9 +131,9 @@ const OverUnderPiePanelComponent: React.FC<OverUnderPiePanelProps> = ({ isPrevie
         </div>
 
         {/* Under-forecast Legend Item */}
-        <div className="flex items-center justify-between p-2 rounded-lg bg-blue-50/40 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/20">
+        <div className="flex items-center justify-between p-2 rounded-lg bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="w-3 h-3 rounded-sm bg-[#86C5EE] shrink-0" />
+            <span className="w-3 h-3 rounded-sm bg-[#0B8FE3] shrink-0" />
             <span className="font-medium text-slate-700 dark:text-[#D4D4D4] truncate">
               Under-forecast <span className="text-[11px] text-slate-400 dark:text-[#737373]">(actual &ge; forecast)</span>
             </span>
