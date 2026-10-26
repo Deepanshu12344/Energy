@@ -67,7 +67,7 @@ def fetch_json_stream(url: str) -> List[dict]:
         return json.loads(raw_bytes)
 
 
-def fetch_fuelhh_actuals(start_date: str = "2026-01-01", end_date: str = "2026-01-31") -> List[ActualRecord]:
+def fetch_fuelhh_actuals(start_date: str = "2026-01-01", end_date: str = "2026-02-01") -> List[ActualRecord]:
     """Fetch half-hourly wind actual generation records from FUELHH for a settlement date range."""
     params = {
         "settlementDateFrom": start_date,
@@ -121,9 +121,9 @@ def fetch_fuelhh_actuals(start_date: str = "2026-01-01", end_date: str = "2026-0
 
 def fetch_windfor_forecasts(
     pub_from: str = "2025-12-24T00:00:00Z",
-    pub_to: str = "2026-02-01T00:00:00Z",
+    pub_to: str = "2026-02-02T00:00:00Z",
     target_start_min: str = "2026-01-01T00:00:00Z",
-    target_start_max: str = "2026-01-31T23:30:00Z",
+    target_start_max: str = "2026-02-01T23:30:00Z",
 ) -> List[ForecastRecord]:
     """Fetch wind forecasts from WINDFOR published within margin predicting target delivery days."""
     params = {
@@ -318,15 +318,15 @@ def main() -> None:
 
     logger.info("=== Starting Wind Data Ingestion Pipeline ===")
     
-    # Define expected January 2026 delivery bounds
+    # Define delivery bounds: decisions in Jan 2026 cover delivery through 2026-02-01
     jan_start_actuals = datetime(2026, 1, 1, 0, 0, tzinfo=timezone.utc)
-    jan_end_actuals = datetime(2026, 1, 31, 23, 30, tzinfo=timezone.utc)
+    jan_end_actuals = datetime(2026, 2, 1, 23, 30, tzinfo=timezone.utc)
 
     jan_start_forecasts = datetime(2026, 1, 1, 0, 0, tzinfo=timezone.utc)
-    jan_end_forecasts = datetime(2026, 1, 31, 23, 0, tzinfo=timezone.utc)
+    jan_end_forecasts = datetime(2026, 2, 1, 23, 0, tzinfo=timezone.utc)
 
     # 1. Fetch Actuals
-    actuals = fetch_fuelhh_actuals("2026-01-01", "2026-01-31")
+    actuals = fetch_fuelhh_actuals("2026-01-01", "2026-02-01")
     actual_count, actual_missing = analyze_actuals_gaps(
         actuals, jan_start_actuals, jan_end_actuals
     )

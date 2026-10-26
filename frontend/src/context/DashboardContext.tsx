@@ -101,9 +101,19 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Filters
   const [singleDate, setSingleDate] = useState('2026-01-15');
   const [cutoffTime, setCutoffTime] = useState('12:00');
-  const [rangeMode, setRangeMode] = useState<RangeMode>('single');
-  const [startDate, setStartDate] = useState('2026-01-01');
-  const [endDate, setEndDate] = useState('2026-01-31');
+  const [rangeMode, setRangeModeState] = useState<RangeMode>('single');
+  const [startDate, setStartDate] = useState('2026-01-02');
+  const [endDate, setEndDate] = useState('2026-02-01');
+
+  // Wrapped setRangeMode that sets singleDate to the first day of the selected range
+  const setRangeMode = useCallback((mode: RangeMode) => {
+    setRangeModeState(mode);
+    if (mode === 'full') {
+      setSingleDate('2026-01-02');
+    } else if (mode === 'custom') {
+      setSingleDate((prev) => (prev >= '2026-01-02' && prev <= '2026-02-01' ? prev : '2026-01-02'));
+    }
+  }, []);
 
   // Modals
   const [expandedPanelId, setExpandedPanelId] = useState<PanelId | null>(null);
@@ -124,10 +134,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Compute effective date range
   const effectiveRange = useMemo(() => {
     if (rangeMode === 'single') {
-      return { start: singleDate, end: singleDate, label: `Day: ${singleDate}` };
+      return { start: singleDate, end: singleDate, label: `Delivery: ${singleDate}` };
     }
     if (rangeMode === 'full') {
-      return { start: '2026-01-01', end: '2026-01-31', label: 'Full Month: January 2026' };
+      return { start: '2026-01-02', end: '2026-02-01', label: 'All January decisions (2 Jan to 1 Feb)' };
     }
     return { start: startDate, end: endDate, label: `Custom: ${startDate} to ${endDate}` };
   }, [rangeMode, singleDate, startDate, endDate]);

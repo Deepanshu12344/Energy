@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, FileText, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, FileText, Sun, Moon, Wind } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -11,7 +11,10 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-30 w-full bg-white dark:bg-[#141414] border-b border-slate-200/80 dark:border-[#2A2A2A] transition-colors">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-16 grid grid-cols-3 items-center">
         {/* Left Zone: Logo */}
-        <div className="flex items-center justify-start">
+        <div className="flex items-center justify-start gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#0B8FE3] text-white flex items-center justify-center shadow-sm">
+            <Wind className="w-4 h-4 text-white" />
+          </div>
           <span className="text-xl font-bold uppercase tracking-normal text-slate-900 dark:text-white select-none">
             WINDCAST
           </span>

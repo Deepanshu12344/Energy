@@ -30,8 +30,8 @@ def get_meta() -> MetaResponse:
     }
 
     return MetaResponse(
-        available_start_date="2026-01-01",
-        available_end_date="2026-01-31",
+        available_start_date="2026-01-02",
+        available_end_date="2026-02-01",
         default_cutoff_time=settings.DEFAULT_GATE_CLOSURE_TIME,
         actual_rows_count=act_count,
         forecast_rows_count=fc_count,

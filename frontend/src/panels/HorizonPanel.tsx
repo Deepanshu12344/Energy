@@ -52,7 +52,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
         </div>
         <div className="flex items-center justify-between gap-4">
           <span className="text-slate-500 dark:text-[#A3A3A3]">Mean Bias:</span>
-          <strong className={d.bias > 0 ? 'text-amber-500' : 'text-[#0B8FE3]'}>
+          <strong className="text-[#0B8FE3]">
             {d.bias > 0 ? `+${d.bias.toLocaleString()}` : d.bias.toLocaleString()} MW
           </strong>
         </div>
@@ -109,10 +109,39 @@ const HorizonPanelComponent: React.FC<HorizonPanelProps> = ({ onRegisterExport, 
     <div className="w-full h-full flex flex-col justify-between">
       <div className="flex-1 w-full min-h-[160px]">
         <ResponsiveContainer width="100%" height="100%" debounce={100}>
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: isPreview ? 5 : 15 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-            <XAxis dataKey="bucket" stroke={axisColor} fontSize={11} tickLine={false} />
-            <YAxis stroke={axisColor} fontSize={10} tickLine={false} />
+            <XAxis
+              dataKey="bucket"
+              stroke={axisColor}
+              fontSize={11}
+              tickLine={false}
+              label={
+                !isPreview
+                  ? {
+                      value: 'Lead time before target',
+                      position: 'insideBottom',
+                      offset: -5,
+                      style: { textAnchor: 'middle', fill: axisColor, fontSize: 10, fontWeight: 500 },
+                    }
+                  : undefined
+              }
+              height={isPreview ? 25 : 30}
+            />
+            <YAxis
+              stroke={axisColor}
+              fontSize={10}
+              tickLine={false}
+              tickFormatter={(val) => Number(val).toLocaleString()}
+              label={{
+                value: 'MW',
+                angle: -90,
+                position: 'insideLeft',
+                offset: -2,
+                style: { textAnchor: 'middle', fill: axisColor, fontSize: 10, fontWeight: 600 },
+              }}
+              width={55}
+            />
             {!isPreview && <Tooltip content={<CustomTooltip />} />}
             <Bar dataKey="mae" name="MAE (MW)" fill="#0B8FE3" radius={[4, 4, 0, 0]} isAnimationActive={false} />
           </BarChart>

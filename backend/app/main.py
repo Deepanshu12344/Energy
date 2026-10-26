@@ -96,11 +96,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         error_details.append(f"{field_path}: {msg}")
     
     return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=ErrorResponse(
             error="VALIDATION_ERROR",
             detail="; ".join(error_details),
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         ).model_dump(),
         headers=_cors_headers(request),
     )
@@ -108,13 +108,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError) -> JSONResponse:
-    """Handle ValueErrors as 400 Bad Request with CORS headers."""
+    """Handle ValueErrors as 422 Unprocessable Entity with CORS headers."""
     return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=ErrorResponse(
             error="VALIDATION_ERROR",
             detail=str(exc),
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         ).model_dump(),
         headers=_cors_headers(request),
     )

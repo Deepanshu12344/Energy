@@ -98,48 +98,53 @@ All endpoints are part of Elexon's open public API (`https://data.elexon.co.uk/b
 
 ---
 
-## 4. Gaps and Duplicates Analysis (January 2026)
+## 4. Gaps and Duplicates Analysis (January Purchase Decisions Scope)
+
+Decisions made in January 2026 (1 Jan to 31 Jan on D-1) correspond to **delivery days 2026-01-02 through 2026-02-01** (31 delivery days).
 
 ### 4.1 Actuals (`FUELHH`)
-- **Total records fetched for January 2026:** 1,488.
-- **Expected half-hour periods (31 days × 48 periods/day):** 1,488.
-- **Unique start timestamps:** 1,488.
+- **Total records loaded in Supabase (2026-01-01 to 2026-02-01):** 1,536 half-hour periods (32 days × 48 periods/day).
+- **Unique start timestamps:** 1,536.
 - **Duplicates:** 0.
-- **Gaps / Missing periods:** 0 (complete 100% coverage).
+- **Gaps / Missing periods:** 0 (complete 100% continuous coverage).
 
 ### 4.2 Forecasts (`WINDFOR`)
-- **Total records fetched (publish window 2025-12-24 to 2026-02-01):** 22,776.
-- **Unique `(startTime, publishTime)` pairs:** 22,776.
+- **Total records loaded in Supabase (publish window 2025-12-24 to 2026-02-02):** 18,664 clean records predicting 1 Jan through 1 Feb target times.
+- **Unique `(startTime, publishTime)` pairs:** 18,664.
 - **Duplicates:** 0.
-- **Forecasts predicting January 2026 target times (`2026-01-01T00:00:00Z` to `2026-01-31T23:00:00Z`):** 18,080.
-- **Distinct January 2026 target hours covered:** 744 (out of 744 expected; 100% coverage of hourly targets).
-- **Average forecast revisions per target hour:** ~24.3 publish revisions per hour.
+- **Distinct January decision delivery target hours covered (2 Jan through 1 Feb):** 744 (out of 744 expected; 100% coverage).
+- **Gaps in hourly target forecasts:** 0.
 
 ---
 
-## 5. Findings from Data Sanity Checks (January 2026)
+## 5. Findings from Data Sanity Checks (January 2026 Decisions: 2026-01-02 to 2026-02-01)
 
 Independent validation directly on raw PostgreSQL records for decision cutoff at 12:00 London on D-1 yielded the following verified findings:
 
 ### 5.1 Time Shift Alignment Check
-Evaluating Pearson correlation between actual generation at $t$ and selected forecast generation at $t + \text{shift}$:
-
-| Time Shift (hours) | Paired Observations | Pearson Correlation ($r$) |
-|:---:|:---:|:---:|
-| -2 hours | 742 | 0.9276 |
-| -1 hours | 743 | 0.9398 |
-| **0 hours (nominal)** | **744** | **0.9463** |
-| +1 hours | 743 | 0.9472 |
-| +2 hours | 742 | 0.9422 |
-
-*Conclusion:* The series are well aligned (correlation about 0.95 across shifts), confirming that the UTC start timestamps in `wind_actuals` and `wind_forecasts` are accurately synchronized. The minor variation at +1h reflects standard meteorological ramp-lead artifacts common in numerical weather prediction models.
+Evaluating Pearson correlation between actual generation at $t$ and selected forecast generation at $t + \text{shift}$ confirms that UTC timestamps in `wind_actuals` and `wind_forecasts` are synchronized with high correlation ($r \approx 0.95$).
 
 ### 5.2 Bias & Over-Forecasting Check
-- **Mean Error (Bias):** **+1,805.86 MW** (independent raw row calculation matches the API service metric exactly).
-- **Directional Tendency:** Wind generation forecasts exhibited a systemic positive bias (over-forecasting) throughout January 2026.
+- **Mean Error (Bias):** **+1,685.27 MW** (evaluating `forecast - actual` across all 744 hourly delivery slots).
+- **Directional Tendency:** Wind generation forecasts exhibited a systemic positive bias (over-forecasting) throughout the January purchase decision window.
+- **Hourly Over-Forecasting Share:** Wind generation forecasts exceeded actuals in **84.95% of evaluated hours** (632 out of 744 hourly slots).
 - **Daily Over-Forecasting Rate:** The mean daily forecast exceeded actual generation on **29 out of 31 days (93.5% of delivery days)**.
 
-### 5.3 Error Percentiles & Operating Reserve Buffer
-- **P90 Absolute Error:** **4,000.00 MW** (computed via linear interpolation on raw deviations $|f - a|$).
-- **Interpretation for Power Buyers:** In 9 out of 10 hourly delivery intervals, the forecast deviation was within 4,000 MW.
+### 5.3 Volumetric Accuracy Metrics
+- **Mean Absolute Error (MAE):** **1,883.98 MW**.
+- **Root Mean Squared Error (RMSE):** **2,350.33 MW**.
+- **Guarded MAPE:** **18.86%** (with 0 hours excluded due to $<10\text{ MW}$ lull threshold).
+
+### 5.4 Error Percentiles & Operating Reserve Buffer
+- **P50 Absolute Error:** **1,606.50 MW**.
+- **P90 Absolute Error:** **3,767.70 MW** (computed via linear interpolation on raw deviations $|f - a|$).
+- **P95 Absolute Error:** **4,497.75 MW**.
+- **Interpretation for Power Buyers:** In 9 out of 10 hourly delivery intervals, the forecast deviation was within 3,768 MW, meaning a buffer of 3,768 MW would have covered volumetric risk for 90% of hours.
+
+### 5.5 Market Auction Context
+- Commercial physical day-ahead auctions in Great Britain close at:
+  - **EPEX SPOT GB Day-Ahead (60-minute auction):** **09:20 Europe/London** (D-1).
+  - **Nord Pool (N2EX) GB Day-Ahead:** **09:50 Europe/London** (D-1).
+- Elexon BSC physical notifications (FPNs) and balancing bids close 1 hour ahead of each half-hour settlement period on day D.
+- The 12:00 London cutoff corresponds to the continental European SDAC auction clearing time and serves as a standardized market analytical benchmark.
 

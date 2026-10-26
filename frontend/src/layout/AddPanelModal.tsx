@@ -141,7 +141,7 @@ export const AddPanelModal: React.FC = () => {
                         addPanel(id);
                       }
                     }}
-                    className="group relative bg-white dark:bg-[#141414] rounded-xl border border-slate-200 dark:border-[#2A2A2A] hover:border-[#0B8FE3] dark:hover:border-[#0B8FE3] hover:shadow-xl transition-all cursor-pointer flex flex-col h-[340px] overflow-hidden focus:outline-none focus:ring-2 focus:ring-[#0B8FE3]"
+                    className="group relative bg-white dark:bg-[#141414] rounded-xl border border-slate-200 dark:border-[#2A2A2A] hover:border-[#0B8FE3] dark:hover:border-[#0B8FE3] hover:shadow-xl transition-all cursor-pointer flex flex-col h-[420px] overflow-hidden focus:outline-none focus:ring-2 focus:ring-[#0B8FE3]"
                     aria-label={`Add ${def.title} to dashboard`}
                   >
                     {/* Card Header */}

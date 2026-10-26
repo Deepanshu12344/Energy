@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect, memo } from 'react';
-import { MoreHorizontal, Maximize2, Download, Trash2, Search, AlertCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect, useMemo, memo } from 'react';
+import { MoreHorizontal, Maximize2, Download, Trash2, Search, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 import { ALL_PANELS, type PanelId } from '../registry/panelRegistry';
+import { getDaysInRange, formatFullDay, getScopeBadge } from '../utils/dateFormatting';
 
 interface PanelShellProps {
   id: PanelId;
@@ -24,12 +25,41 @@ const PanelShellComponent: React.FC<PanelShellProps> = ({
   onExportCsv,
   isDragging = false,
 }) => {
-  const { removePanel, setExpandedPanelId, refetchPanel } = useDashboard();
+  const {
+    removePanel,
+    setExpandedPanelId,
+    refetchPanel,
+    rangeMode,
+    singleDate,
+    setSingleDate,
+    effectiveRange,
+  } = useDashboard();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const def = ALL_PANELS[id];
   const title = def?.title || id;
+
+  const rangeDays = useMemo(() => {
+    return getDaysInRange(effectiveRange.start, effectiveRange.end);
+  }, [effectiveRange.start, effectiveRange.end]);
+
+  const currentIndex = rangeDays.indexOf(singleDate);
+  const safeIndex = currentIndex !== -1 ? currentIndex : 0;
+  const hasPrevDay = safeIndex > 0;
+  const hasNextDay = safeIndex < rangeDays.length - 1;
+
+  const handlePrevDay = () => {
+    if (hasPrevDay) setSingleDate(rangeDays[safeIndex - 1]);
+  };
+
+  const handleNextDay = () => {
+    if (hasNextDay) setSingleDate(rangeDays[safeIndex + 1]);
+  };
+
+  const scopeBadgeText = useMemo(() => {
+    return getScopeBadge(rangeMode, singleDate, effectiveRange.start, effectiveRange.end);
+  }, [rangeMode, singleDate, effectiveRange.start, effectiveRange.end]);
 
   // Close menu on click outside
   useEffect(() => {
@@ -53,14 +83,67 @@ const PanelShellComponent: React.FC<PanelShellProps> = ({
       }`}
     >
       {/* Panel Header (Restricted drag handle for react-grid-layout) */}
-      <div className="panel-header-drag flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-[#2A2A2A] select-none cursor-grab active:cursor-grabbing">
-        {/* Title */}
-        <h3 className="text-base font-semibold text-slate-800 dark:text-white tracking-tight">
-          {title}
-        </h3>
+      <div className="panel-header-drag flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-[#2A2A2A] select-none cursor-grab active:cursor-grabbing gap-3">
+        {/* Title and Scope Badge / In-panel Day Picker */}
+        <div className="flex items-center gap-2.5 flex-wrap min-w-0">
+          <h3 className="text-base font-semibold text-slate-800 dark:text-white tracking-tight truncate">
+            {title}
+          </h3>
+
+          {/* In-panel Day Picker for Forecast chart in multi-day range mode */}
+          {id === 'forecast' && rangeMode !== 'single' ? (
+            <div
+              className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-[#A3A3A3] pointer-events-auto"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <span className="text-xs font-medium text-slate-500 dark:text-[#737373] hidden sm:inline">
+                Day shown:
+              </span>
+              <div className="flex items-center bg-slate-100 dark:bg-[#1F1F1F] rounded-md border border-slate-200 dark:border-[#2A2A2A] p-0.5">
+                <button
+                  type="button"
+                  disabled={!hasPrevDay}
+                  onClick={handlePrevDay}
+                  title="Previous day"
+                  className="p-1 rounded text-slate-600 dark:text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white dark:hover:bg-[#2A2A2A] transition"
+                  aria-label="Previous day in range"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <select
+                  value={singleDate}
+                  onChange={(e) => setSingleDate(e.target.value)}
+                  className="bg-transparent text-xs font-semibold text-slate-800 dark:text-white px-1.5 py-0.5 focus:outline-none cursor-pointer"
+                  aria-label="Day shown"
+                >
+                  {rangeDays.map((d) => (
+                    <option key={d} value={d} className="bg-white dark:bg-[#141414] text-slate-800 dark:text-white">
+                      {formatFullDay(d)}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  disabled={!hasNextDay}
+                  onClick={handleNextDay}
+                  title="Next day"
+                  className="p-1 rounded text-slate-600 dark:text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white dark:hover:bg-[#2A2A2A] transition"
+                  aria-label="Next day in range"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Explicit scope badge in every other panel */
+            <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/50 text-[#0B8FE3] dark:text-[#86C5EE] border border-blue-100 dark:border-blue-900/40 shrink-0">
+              {scopeBadgeText}
+            </span>
+          )}
+        </div>
 
         {/* Header Right Actions */}
-        <div className="flex items-center gap-1 pointer-events-auto" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1 pointer-events-auto shrink-0" onMouseDown={(e) => e.stopPropagation()}>
           {/* Search Icon (for Data Table) */}
           {def?.hasSearch && onSearchToggle && (
             <button

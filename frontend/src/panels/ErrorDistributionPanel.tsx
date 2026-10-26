@@ -67,21 +67,30 @@ const ErrorDistributionPanelComponent: React.FC<ErrorDistributionPanelProps> = (
 
   const chartData = React.useMemo(() => {
     if (!distribution?.bins) return [];
-    return distribution.bins.map((b) => ({
-      label: b.bin_label,
-      count: b.count,
-      min: b.bin_min,
-      max: b.bin_max,
-      isOver: b.bin_min >= 0 || b.bin_max > 0,
-    }));
+    return distribution.bins.map((b) => {
+      const minRounded = Math.round(b.bin_min);
+      const maxRounded = Math.round(b.bin_max);
+      return {
+        label: `${minRounded.toLocaleString()} to ${maxRounded.toLocaleString()}`,
+        count: b.count,
+        min: b.bin_min,
+        max: b.bin_max,
+        isOver: b.bin_min >= 0 || b.bin_max > 0,
+      };
+    });
   }, [distribution]);
 
   // Register CSV export
   React.useEffect(() => {
     if (onRegisterExport && distribution?.bins) {
       onRegisterExport(() => {
-        const headers = ['Bin Label', 'Min Error (MW)', 'Max Error (MW)', 'Hourly Count'];
-        const rows = distribution.bins.map((b) => [b.bin_label, b.bin_min, b.bin_max, b.count]);
+        const headers = ['Bin Range (MW)', 'Min Error (MW)', 'Max Error (MW)', 'Hourly Count'];
+        const rows = distribution.bins.map((b) => [
+          `${Math.round(b.bin_min)} to ${Math.round(b.bin_max)} MW`,
+          b.bin_min,
+          b.bin_max,
+          b.count,
+        ]);
         downloadCsv(`error_distribution_${effectiveRange.start}_${effectiveRange.end}`, headers, rows);
       });
     }
@@ -99,24 +108,46 @@ const ErrorDistributionPanelComponent: React.FC<ErrorDistributionPanelProps> = (
     <div className="w-full h-full flex flex-col justify-between">
       <div className="flex-1 w-full min-h-[160px]">
         <ResponsiveContainer width="100%" height="100%" debounce={100}>
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: isPreview ? 10 : 25 }}>
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: isPreview ? 5 : 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
             <XAxis
               dataKey="label"
               stroke={axisColor}
               fontSize={10}
-              angle={-25}
-              textAnchor="end"
               tickLine={false}
-              interval={isPreview ? 2 : 0}
+              interval={1}
+              label={
+                !isPreview
+                  ? {
+                      value: 'Forecast error (MW)',
+                      position: 'insideBottom',
+                      offset: -5,
+                      style: { textAnchor: 'middle', fill: axisColor, fontSize: 10, fontWeight: 500 },
+                    }
+                  : undefined
+              }
+              height={isPreview ? 25 : 30}
             />
-            <YAxis stroke={axisColor} fontSize={11} tickLine={false} />
+            <YAxis
+              stroke={axisColor}
+              fontSize={10}
+              tickLine={false}
+              tickFormatter={(val) => Number(val).toLocaleString()}
+              label={{
+                value: 'Hours',
+                angle: -90,
+                position: 'insideLeft',
+                offset: -2,
+                style: { textAnchor: 'middle', fill: axisColor, fontSize: 10, fontWeight: 600 },
+              }}
+              width={50}
+            />
             {!isPreview && <Tooltip content={<CustomTooltip />} />}
             <Bar dataKey="count" radius={[4, 4, 0, 0]} isAnimationActive={false}>
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.isOver ? '#0B8FE3' : '#86C5EE'}
+                  fill={entry.isOver ? '#F59E0B' : '#0B8FE3'}
                 />
               ))}
             </Bar>
@@ -127,11 +158,11 @@ const ErrorDistributionPanelComponent: React.FC<ErrorDistributionPanelProps> = (
       {/* Screenshot-Style Legend */}
       <div className="flex items-center justify-center gap-6 mt-2 pt-2 border-t border-slate-100 dark:border-[#2A2A2A] text-xs font-medium text-slate-600 dark:text-[#A3A3A3]">
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#0B8FE3]" />
+          <span className="w-3 h-3 rounded-sm bg-[#F59E0B]" />
           <span>Over-forecast (F &gt; A)</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#86C5EE]" />
+          <span className="w-3 h-3 rounded-sm bg-[#0B8FE3]" />
           <span>Under-forecast (F &lt; A)</span>
         </div>
       </div>

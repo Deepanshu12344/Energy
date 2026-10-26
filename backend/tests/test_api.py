@@ -31,8 +31,8 @@ def test_api_meta(test_client: TestClient):
     resp = test_client.get("/api/meta")
     assert resp.status_code == 200
     data = resp.json()
-    assert data["available_start_date"] == "2026-01-01"
-    assert data["available_end_date"] == "2026-01-31"
+    assert data["available_start_date"] == "2026-01-02"
+    assert data["available_end_date"] == "2026-02-01"
     assert data["default_cutoff_time"] == "12:00"
     assert data["timezone"] == "Europe/London"
     assert "resolution_notes" in data
@@ -66,11 +66,11 @@ def test_api_forecast_happy_path(test_client: TestClient):
 
 def test_api_metrics_happy_path(test_client: TestClient):
     """GET /api/metrics returns accuracy metrics with P90 buffer and MAPE exclusion count."""
-    resp = test_client.get("/api/metrics?start=2026-01-01&end=2026-01-15&cutoff=12:00")
+    resp = test_client.get("/api/metrics?start=2026-01-02&end=2026-01-16&cutoff=12:00")
     assert resp.status_code == 200
     data = resp.json()
-    assert data["start_date"] == "2026-01-01"
-    assert data["end_date"] == "2026-01-15"
+    assert data["start_date"] == "2026-01-02"
+    assert data["end_date"] == "2026-01-16"
     assert "metrics" in data
     metrics = data["metrics"]
     assert "mae" in metrics
@@ -84,7 +84,7 @@ def test_api_metrics_happy_path(test_client: TestClient):
 
 def test_api_error_by_hour_happy_path(test_client: TestClient):
     """GET /api/error-by-hour returns 24 hours (0..23) of aggregated accuracy metrics."""
-    resp = test_client.get("/api/error-by-hour?start=2026-01-01&end=2026-01-05&cutoff=12:00")
+    resp = test_client.get("/api/error-by-hour?start=2026-01-02&end=2026-01-06&cutoff=12:00")
     assert resp.status_code == 200
     data = resp.json()
     assert len(data["hourly_errors"]) == 24
@@ -93,7 +93,7 @@ def test_api_error_by_hour_happy_path(test_client: TestClient):
 
 def test_api_horizon_analysis_happy_path(test_client: TestClient):
     """GET /api/horizon-analysis returns forward buckets and after_target_bucket."""
-    resp = test_client.get("/api/horizon-analysis?start=2026-01-01&end=2026-01-05")
+    resp = test_client.get("/api/horizon-analysis?start=2026-01-02&end=2026-01-06")
     assert resp.status_code == 200
     data = resp.json()
     assert "main_buckets" in data
@@ -106,11 +106,11 @@ def test_api_horizon_analysis_happy_path(test_client: TestClient):
 
 def test_api_error_distribution_happy_path(test_client: TestClient):
     """GET /api/error-distribution returns dynamic histogram bins and over_forecast_share."""
-    resp = test_client.get("/api/error-distribution?start=2026-01-01&end=2026-01-05&cutoff=12:00&bins=8")
+    resp = test_client.get("/api/error-distribution?start=2026-01-02&end=2026-01-06&cutoff=12:00&bins=8")
     assert resp.status_code == 200
     data = resp.json()
-    assert data["start_date"] == "2026-01-01"
-    assert data["end_date"] == "2026-01-05"
+    assert data["start_date"] == "2026-01-02"
+    assert data["end_date"] == "2026-01-06"
     assert "total_samples" in data
     assert "over_forecast_share" in data
     assert 0.0 <= data["over_forecast_share"] <= 1.0
@@ -119,47 +119,72 @@ def test_api_error_distribution_happy_path(test_client: TestClient):
     assert data["bins"][-1]["bin_max"] == data["max_error_mw"]
 
 
-# Error Handling & Validation Tests
+# Scope Boundary & Error Handling Tests
+def test_boundary_delivery_dates(test_client: TestClient):
+    """Test that 2026-01-01 and 2026-02-02 are rejected with 422, while 2026-01-02 and 2026-02-01 succeed."""
+    # 2026-01-01 must be rejected with 422
+    resp_01_01 = test_client.get("/api/forecast?date=2026-01-01&cutoff=12:00")
+    assert resp_01_01.status_code == 422
+    assert resp_01_01.json()["error"] == "VALIDATION_ERROR"
+    assert "out of scope" in resp_01_01.json()["detail"]
+
+    # 2026-02-02 must be rejected with 422
+    resp_02_02 = test_client.get("/api/forecast?date=2026-02-02&cutoff=12:00")
+    assert resp_02_02.status_code == 422
+    assert resp_02_02.json()["error"] == "VALIDATION_ERROR"
+    assert "out of scope" in resp_02_02.json()["detail"]
+
+    # 2026-01-02 must be accepted (200)
+    resp_01_02 = test_client.get("/api/forecast?date=2026-01-02&cutoff=12:00")
+    assert resp_01_02.status_code == 200
+    assert resp_01_02.json()["delivery_date"] == "2026-01-02"
+
+    # 2026-02-01 must be accepted (200)
+    resp_02_01 = test_client.get("/api/forecast?date=2026-02-01&cutoff=12:00")
+    assert resp_02_01.status_code == 200
+    assert resp_02_01.json()["delivery_date"] == "2026-02-01"
+
+
 def test_invalid_date_format(test_client: TestClient):
-    """Test invalid calendar date format returns 400 with ErrorResponse."""
+    """Test invalid calendar date format returns 422 with ErrorResponse."""
     resp = test_client.get("/api/forecast?date=2026-01-35&cutoff=12:00")
-    assert resp.status_code == 400
+    assert resp.status_code == 422
     data = resp.json()
     assert data["error"] == "VALIDATION_ERROR"
-    assert data["status_code"] == 400
+    assert data["status_code"] == 422
 
 
 def test_out_of_range_date(test_client: TestClient):
-    """Test date outside January 2026 returns 400 with ErrorResponse."""
+    """Test date outside January 2026 decisions returns 422 with ErrorResponse."""
     resp = test_client.get("/api/forecast?date=2025-12-31&cutoff=12:00")
-    assert resp.status_code == 400
+    assert resp.status_code == 422
     data = resp.json()
     assert data["error"] == "VALIDATION_ERROR"
     assert "out of scope" in data["detail"]
 
 
 def test_start_greater_than_end(test_client: TestClient):
-    """Test start date after end date returns 400 with ErrorResponse."""
+    """Test start date after end date returns 422 with ErrorResponse."""
     resp = test_client.get("/api/metrics?start=2026-01-20&end=2026-01-10&cutoff=12:00")
-    assert resp.status_code == 400
+    assert resp.status_code == 422
     data = resp.json()
     assert data["error"] == "VALIDATION_ERROR"
     assert "start date" in data["detail"]
 
 
 def test_bad_cutoff_format(test_client: TestClient):
-    """Test invalid cutoff format returns 400 with ErrorResponse."""
+    """Test invalid cutoff format returns 422 with ErrorResponse."""
     resp = test_client.get("/api/forecast?date=2026-01-15&cutoff=25:00")
-    assert resp.status_code == 400
+    assert resp.status_code == 422
     data = resp.json()
     assert data["error"] == "VALIDATION_ERROR"
     assert "Invalid cutoff format" in data["detail"]
 
 
 def test_missing_required_params(test_client: TestClient):
-    """Test missing required date parameter returns 400 with ErrorResponse."""
+    """Test missing required date parameter returns 422 with ErrorResponse."""
     resp = test_client.get("/api/forecast")
-    assert resp.status_code == 400
+    assert resp.status_code == 422
     data = resp.json()
     assert data["error"] == "VALIDATION_ERROR"
 

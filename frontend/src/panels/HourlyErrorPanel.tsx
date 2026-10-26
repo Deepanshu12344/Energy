@@ -54,7 +54,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
             <span className="w-2.5 h-2.5 rounded-full bg-[#0B8FE3]" />
             Mean Bias:
           </span>
-          <strong className={d.bias > 0 ? 'text-amber-500' : 'text-[#0B8FE3]'}>
+          <strong className="text-[#0B8FE3]">
             {d.bias > 0 ? `+${d.bias.toLocaleString()}` : d.bias.toLocaleString()} MW
           </strong>
         </div>
@@ -122,7 +122,7 @@ const HourlyErrorPanelComponent: React.FC<HourlyErrorPanelProps> = ({
     <div className="w-full h-full flex flex-col justify-between">
       <div className="flex-1 w-full min-h-[160px]">
         <ResponsiveContainer width="100%" height="100%" debounce={100}>
-          <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+          <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: isPreview ? 5 : 15 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
             <XAxis
               dataKey="hourLabel"
@@ -130,8 +130,32 @@ const HourlyErrorPanelComponent: React.FC<HourlyErrorPanelProps> = ({
               fontSize={10}
               tickLine={false}
               interval={isPreview ? 5 : 2}
+              label={
+                !isPreview
+                  ? {
+                      value: 'Hour (UTC)',
+                      position: 'insideBottom',
+                      offset: -5,
+                      style: { textAnchor: 'middle', fill: axisColor, fontSize: 10, fontWeight: 500 },
+                    }
+                  : undefined
+              }
+              height={isPreview ? 25 : 30}
             />
-            <YAxis stroke={axisColor} fontSize={10} tickLine={false} />
+            <YAxis
+              stroke={axisColor}
+              fontSize={10}
+              tickLine={false}
+              tickFormatter={(val) => Number(val).toLocaleString()}
+              label={{
+                value: 'MW',
+                angle: -90,
+                position: 'insideLeft',
+                offset: -2,
+                style: { textAnchor: 'middle', fill: axisColor, fontSize: 10, fontWeight: 600 },
+              }}
+              width={55}
+            />
             {!isPreview && <Tooltip content={<CustomTooltip />} />}
             {/* MAE Bars */}
             <Bar

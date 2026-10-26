@@ -147,27 +147,45 @@ def test_dst_timezone_edge_case():
     assert item.publish_time == datetime(2026, 6, 14, 11, 0, tzinfo=timezone.utc)
 
 
-def test_january_first_cutoff_matches_december_margin():
-    """Verify that delivery day 2026-01-01 uses D-1 cutoff on 2025-12-31 and matches December forecasts."""
-    jan_one = date(2026, 1, 1)
-    cutoff_utc = compute_day_ahead_cutoff(jan_one, "12:00", tz_name="Europe/London")
+def test_first_delivery_day_2_jan_cutoff_on_1_jan():
+    """Verify first delivery day (2 Jan) uses cutoff on 1 Jan 12:00 UTC."""
+    delivery_date = date(2026, 1, 2)
+    cutoff_utc = compute_day_ahead_cutoff(delivery_date, "12:00", tz_name="Europe/London")
+    assert cutoff_utc == datetime(2026, 1, 1, 12, 0, tzinfo=timezone.utc)
 
-    # In January (GMT), 12:00 London = 12:00 UTC on 2025-12-31
-    assert cutoff_utc == datetime(2025, 12, 31, 12, 0, tzinfo=timezone.utc)
-
-    target_st = datetime(2026, 1, 1, 0, 0, tzinfo=timezone.utc)
-    actuals = [ActualRecord(start_time=target_st, generation_mw=13756.0)]
+    target_st = datetime(2026, 1, 2, 0, 0, tzinfo=timezone.utc)
+    actuals = [ActualRecord(start_time=target_st, generation_mw=12000.0)]
     candidates = [
         ForecastRecord(
             start_time=target_st,
-            publish_time=datetime(2025, 12, 31, 11, 30, tzinfo=timezone.utc),
-            generation_mw=13500.0,
+            publish_time=datetime(2026, 1, 1, 11, 45, tzinfo=timezone.utc),
+            generation_mw=12200.0,
         )
     ]
-
-    items = select_latest_forecasts_for_delivery_day(jan_one, cutoff_utc, actuals, candidates)
+    items = select_latest_forecasts_for_delivery_day(delivery_date, cutoff_utc, actuals, candidates)
     item = next(it for it in items if it.start_time == target_st)
-
     assert item.status == "forecast_selected"
-    assert item.forecast_mw == 13500.0
-    assert item.publish_time == datetime(2025, 12, 31, 11, 30, tzinfo=timezone.utc)
+    assert item.forecast_mw == 12200.0
+    assert item.publish_time == datetime(2026, 1, 1, 11, 45, tzinfo=timezone.utc)
+
+
+def test_last_delivery_day_1_feb_cutoff_on_31_jan():
+    """Verify last delivery day (1 Feb) uses cutoff on 31 Jan 12:00 UTC."""
+    delivery_date = date(2026, 2, 1)
+    cutoff_utc = compute_day_ahead_cutoff(delivery_date, "12:00", tz_name="Europe/London")
+    assert cutoff_utc == datetime(2026, 1, 31, 12, 0, tzinfo=timezone.utc)
+
+    target_st = datetime(2026, 2, 1, 10, 0, tzinfo=timezone.utc)
+    actuals = [ActualRecord(start_time=target_st, generation_mw=14500.0)]
+    candidates = [
+        ForecastRecord(
+            start_time=target_st,
+            publish_time=datetime(2026, 1, 31, 11, 30, tzinfo=timezone.utc),
+            generation_mw=14100.0,
+        )
+    ]
+    items = select_latest_forecasts_for_delivery_day(delivery_date, cutoff_utc, actuals, candidates)
+    item = next(it for it in items if it.start_time == target_st)
+    assert item.status == "forecast_selected"
+    assert item.forecast_mw == 14100.0
+    assert item.publish_time == datetime(2026, 1, 31, 11, 30, tzinfo=timezone.utc)

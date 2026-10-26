@@ -10,7 +10,7 @@ interface MetricTileProps {
   subtext?: string;
   badge?: {
     text: string;
-    variant: 'blue' | 'amber' | 'slate';
+    variant?: 'blue' | 'slate';
   };
   isPreview?: boolean;
 }
@@ -24,8 +24,12 @@ const MetricTile: React.FC<MetricTileProps> = ({
   badge,
   isPreview = false,
 }) => (
-  <div className="bg-slate-50/80 dark:bg-[#1A1A1A] rounded-xl p-3 border border-slate-100 dark:border-[#2A2A2A] flex flex-col justify-between group relative">
-    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-[#A3A3A3] mb-1">
+  <div className={`bg-slate-50/80 dark:bg-[#1A1A1A] rounded-xl border border-slate-100 dark:border-[#2A2A2A] flex flex-col justify-between group relative ${
+    isPreview ? 'p-2 sm:p-2.5' : 'p-3'
+  }`}>
+    <div className={`flex items-center justify-between text-slate-500 dark:text-[#A3A3A3] ${
+      isPreview ? 'text-[11px] mb-0.5' : 'text-xs mb-1'
+    }`}>
       <span className="font-medium truncate">{label}</span>
       {!isPreview && (
         <div className="relative group/help">
@@ -37,25 +41,25 @@ const MetricTile: React.FC<MetricTileProps> = ({
       )}
     </div>
 
-    <div className="flex items-baseline gap-1 my-0.5">
-      <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+    <div className={`flex items-baseline gap-1 ${isPreview ? 'my-0' : 'my-0.5'}`}>
+      <span className={`font-bold tracking-tight text-slate-900 dark:text-white ${
+        isPreview ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'
+      }`}>
         {value}
       </span>
-      {unit && <span className="text-xs font-semibold text-slate-500 dark:text-[#A3A3A3]">{unit}</span>}
+      {unit && (
+        <span className={`font-semibold text-slate-500 dark:text-[#A3A3A3] ${
+          isPreview ? 'text-[11px]' : 'text-xs'
+        }`}>
+          {unit}
+        </span>
+      )}
     </div>
 
-    <div className="flex items-center justify-between mt-1 text-[11px]">
+    <div className="flex items-center justify-between mt-0.5 text-[10px] sm:text-[11px]">
       {subtext && <span className="text-slate-400 dark:text-[#737373] truncate">{subtext}</span>}
       {badge && (
-        <span
-          className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-            badge.variant === 'amber'
-              ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400'
-              : badge.variant === 'blue'
-              ? 'bg-blue-50 text-[#0B8FE3] dark:bg-blue-950/40 dark:text-[#86C5EE]'
-              : 'bg-slate-100 text-slate-600 dark:bg-[#2A2A2A] dark:text-[#A3A3A3]'
-          }`}
-        >
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-[#0B8FE3] dark:bg-blue-950/40 dark:text-[#86C5EE] border border-blue-100/60 dark:border-blue-900/30">
           {badge.text}
         </span>
       )}
@@ -101,7 +105,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           value={m.rmse !== null ? m.rmse.toLocaleString() : 'N/A'}
           unit="MW"
           tooltip="Root Mean Squared Error: penalizes large forecast misses more severely than MAE."
-          subtext="Volumetric spread"
+          subtext="Typical error size; large misses weigh more"
           isPreview={isPreview}
         />
 
@@ -113,7 +117,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           tooltip="Average error (Forecast - Actual). Positive means forecasts persistently exceed actual generation."
           badge={{
             text: biasLabel,
-            variant: m.bias !== null && m.bias > 0 ? 'amber' : 'blue',
+            variant: 'blue',
           }}
           isPreview={isPreview}
         />
@@ -123,7 +127,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           label="MAPE"
           value={m.mape !== null ? `${m.mape}%` : 'N/A'}
           tooltip="Mean Absolute Percentage Error. Outturns under 10 MW are excluded to guard against division-by-zero spikes."
-          subtext={m.mape_excluded_count > 0 ? `${m.mape_excluded_count} lull hours excluded` : 'Zero lull exclusions'}
+          subtext={`${m.mape_excluded_count} hours excluded (actual < 10 MW)`}
           isPreview={isPreview}
         />
 
@@ -145,7 +149,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           tooltip="Evaluated hourly settlement slots where both actuals and cutoff-compliant forecasts were matched."
           badge={{
             text: m.missing_slots === 0 ? '100% Coverage' : `${m.missing_slots} Missing`,
-            variant: m.missing_slots === 0 ? 'blue' : 'amber',
+            variant: 'blue',
           }}
           isPreview={isPreview}
         />

@@ -59,7 +59,7 @@ const FilterBarComponent: React.FC = () => {
                   : 'text-slate-600 dark:text-[#A3A3A3] hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              Full Jan 2026
+              All January decisions
             </button>
             <button
               type="button"
@@ -74,22 +74,24 @@ const FilterBarComponent: React.FC = () => {
             </button>
           </div>
 
-          {/* Delivery Date Picker (for single day & chart focus) */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="delivery-date-input" className="text-xs font-medium text-slate-500 dark:text-[#A3A3A3] flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-[#737373]" />
-              <span>{rangeMode === 'single' ? 'Delivery Day' : 'Focus Day'}:</span>
-            </label>
-            <input
-              id="delivery-date-input"
-              type="date"
-              min="2026-01-01"
-              max="2026-01-31"
-              value={singleDate}
-              onChange={(e) => setSingleDate(e.target.value)}
-              className="bg-slate-50 dark:bg-[#1F1F1F] border border-slate-200 dark:border-[#2A2A2A] text-slate-800 dark:text-white text-xs rounded-lg px-2.5 py-1.5 font-medium focus:outline-none focus:ring-1 focus:ring-[#0B8FE3]"
-            />
-          </div>
+          {/* Delivery Date Picker (shown ONLY in Single Day mode; multi-day charts use in-panel day picker) */}
+          {rangeMode === 'single' && (
+            <div className="flex items-center gap-2">
+              <label htmlFor="delivery-date-input" className="text-xs font-medium text-slate-500 dark:text-[#A3A3A3] flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-[#737373]" />
+                <span>Delivery Day:</span>
+              </label>
+              <input
+                id="delivery-date-input"
+                type="date"
+                min="2026-01-02"
+                max="2026-02-01"
+                value={singleDate}
+                onChange={(e) => setSingleDate(e.target.value)}
+                className="bg-slate-50 dark:bg-[#1F1F1F] border border-slate-200 dark:border-[#2A2A2A] text-slate-800 dark:text-white text-xs rounded-lg px-2.5 py-1.5 font-medium focus:outline-none focus:ring-1 focus:ring-[#0B8FE3]"
+              />
+            </div>
+          )}
 
           {/* Custom Range Inputs */}
           {rangeMode === 'custom' && (
@@ -97,7 +99,7 @@ const FilterBarComponent: React.FC = () => {
               <span className="text-xs text-slate-400 dark:text-[#737373]">From:</span>
               <input
                 type="date"
-                min="2026-01-01"
+                min="2026-01-02"
                 max={endDate}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
@@ -107,7 +109,7 @@ const FilterBarComponent: React.FC = () => {
               <input
                 type="date"
                 min={startDate}
-                max="2026-01-31"
+                max="2026-02-01"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="bg-slate-50 dark:bg-[#1F1F1F] border border-slate-200 dark:border-[#2A2A2A] text-slate-800 dark:text-white text-xs rounded-lg px-2.5 py-1.5 font-medium focus:outline-none focus:ring-1 focus:ring-[#0B8FE3]"
@@ -119,7 +121,7 @@ const FilterBarComponent: React.FC = () => {
           <div className="flex items-center gap-2">
             <label htmlFor="cutoff-time-input" className="text-xs font-medium text-slate-500 dark:text-[#A3A3A3] flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-[#737373]" />
-              <span>D-1 Gate:</span>
+              <span>D-1 cutoff:</span>
             </label>
             <input
               id="cutoff-time-input"

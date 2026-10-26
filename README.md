@@ -18,31 +18,32 @@ The system benchmarks official National Grid ESO day-ahead wind forecasts (**`WI
 
 ## 1. Project Overview & Problem Solved
 
-In the Great Britain electricity market, energy buyers and wind generators must submit their final physical contract notifications by Day-Ahead gate closure (traditionally **12:00 Europe/London** on day D-1). Wind generation is intermittent and volatile, but forecasting errors directly translate into costly cash-out imbalance settlement charges if a buyer is left under- or over-contracted.
+In the Great Britain electricity market, energy buyers and wind generators submit physical contract notifications for the day ahead. While commercial day-ahead blind auctions for wholesale physical power close at **09:20 Europe/London** (EPEX SPOT 60-minute auction) and **09:50 Europe/London** (Nord Pool N2EX auction) on day D-1, the continental European coupling benchmark cutoff has historically been **12:00 Europe/London** (12:00 CET). Wind generation is intermittent and weather-dependent, so forecasting misses directly translate into costly cash-out balancing mechanism charges if a buyer is left out of balance.
 
-National Grid continually updates wind forecasts up to 66 hours before delivery. Energy traders cannot reliably make trading decisions based on unversioned forecasts: they need to know what the forecast actually predicted at the exact time their day-ahead auction bids closed.
+National Grid / Elexon continuously publish wind forecast revisions up to 66 hours before delivery. Energy traders cannot reliably make decisions based on unversioned forecasts: they need to evaluate the exact forecasts that were available when day-ahead purchase decisions were locked in.
 
 This application solves this by:
-1. Freezing forecast evaluations at the user-defined D-1 trading cutoff (defaulting to **12:00 Europe/London** on day D-1).
-2. Benchmarking the latest forecast published at or before that cutoff against the exact physical generation outturn.
-3. Translating mathematical error distributions into actionable decision support: an operating reserve buffer (P90) and directional bias observation.
+1. Evaluating purchase decisions made in January 2026 (1 Jan to 31 Jan D-1 decision window), corresponding to **delivery days 2026-01-02 through 2026-02-01**.
+2. Freezing forecast evaluations at the user-defined D-1 trading cutoff (defaulting to **12:00 Europe/London** on day D-1).
+3. Benchmarking the latest forecast published at or before that cutoff against the exact physical generation outturn.
+4. Translating mathematical error distributions into actionable decision support: an operating reserve buffer (P90) and directional bias observation.
 
 ---
 
-## 2. Key Findings from January 2026 (Real Data)
+## 2. Key Findings from January 2026 Decisions (Real Data)
 
-Independent validation across all 744 hourly delivery intervals of January 2026 revealed the following findings directly from the raw database records and API metrics:
+Independent validation across all 744 hourly delivery intervals for January 2026 purchase decisions (delivery days **2026-01-02 through 2026-02-01**) at the 12:00 D-1 cutoff revealed the following verified findings directly from the raw database records and API metrics:
 
 | Metric | Validated Value | Interpretation & Source |
 |---|---|---|
-| **Mean Error (Bias)** | **+1,805.86 MW** | Systemic over-forecasting. Forecasts overshot actual wind outturn by an average of 1.8 GW across the month. *(From `GET /api/metrics` and raw database averages)*. |
-| **Daily Over-Forecasting Rate** | **29 of 31 days (93.5%)** | The average daily forecast was **higher than actual on 29 of 31 days (93.5% of delivery days)** in January 2026. Only 2 days under-forecast. *(From raw database daily outturn averages)*. |
-| **Hourly Over-Forecasting Share** | **78.9% of hours** | Wind forecasts were **higher than actual in 78.9% of hours** (587 out of 744 evaluated hourly slots). *(From `GET /api/error-distribution`)*. |
-| **Mean Absolute Error (MAE)** | **2,002.91 MW** | The average absolute volumetric deviation between forecast and actual outturn. *(From `GET /api/metrics`)*. |
-| **Root Mean Squared Error (RMSE)**| **2,470.08 MW** | Penalizes severe forecast swings and sudden ramp misses. *(From `GET /api/metrics`)*. |
-| **Guarded MAPE** | **19.5%** | Evaluated on valid slots; zero slots were distorted by near-zero wind lull generation ($<10\text{ MW}$). *(From `GET /api/metrics`)*. |
-| **P90 Absolute Error (Buffer)** | **4,000.00 MW** | In 9 of 10 hours the forecast was within 4,000 MW of actual, so a buffer of 4,000 MW would have covered most hours. *(From `GET /api/metrics` via linear percentile)*. |
-| **P95 Absolute Error** | **4,686.10 MW** | Extreme tail deviation representing severe gale ramp misses. *(From `GET /api/metrics`)*. |
+| **Mean Error (Bias)** | **+1,685.27 MW** | Systemic over-forecasting. Forecasts overshot actual wind outturn by an average of 1.69 GW across the evaluation window. *(From `GET /api/metrics`)*. |
+| **Daily Over-Forecasting Rate** | **29 of 31 days (93.5%)** | The average daily forecast was **higher than actual on 29 of 31 delivery days (93.5%)**. Only 2 days under-forecast. *(From raw database daily outturn averages)*. |
+| **Hourly Over-Forecasting Share** | **85.0% of hours** | Wind forecasts were **higher than actual in 85.0% of hours** (632 out of 744 evaluated hourly slots). *(From `GET /api/error-distribution`)*. |
+| **Mean Absolute Error (MAE)** | **1,883.98 MW** | The average absolute volumetric deviation between forecast and actual outturn. *(From `GET /api/metrics`)*. |
+| **Root Mean Squared Error (RMSE)**| **2,350.33 MW** | Penalizes severe forecast swings and sudden ramp misses. *(From `GET /api/metrics`)*. |
+| **Guarded MAPE** | **18.86%** | Evaluated on valid slots; zero slots were distorted by near-zero wind lull generation ($<10\text{ MW}$). *(From `GET /api/metrics`)*. |
+| **P90 Absolute Error (Buffer)** | **3,767.70 MW** | In 9 of 10 hours the forecast was within 3,768 MW of actual, so a buffer of 3,768 MW would have covered most hours. *(From `GET /api/metrics` via linear percentile)*. |
+| **P95 Absolute Error** | **4,497.75 MW** | Extreme tail deviation representing severe gale ramp misses. *(From `GET /api/metrics`)*. |
 
 ### Accuracy by Lead Time Horizon
 Evaluation of all 18,080 published forecasts in January 2026 demonstrates clear skill degradation as lead time increases (`GET /api/horizon-analysis`):
@@ -71,8 +72,8 @@ All January 2026 data was pre-loaded into Supabase PostgreSQL during setup. **Th
 flowchart TD
     subgraph Storage["Supabase PostgreSQL (Pre-loaded)"]
         direction TB
-        DB_Actuals[("wind_actuals<br/>1,488 half-hourly rows")]
-        DB_Forecasts[("wind_forecasts<br/>18,080 hourly revisions")]
+        DB_Actuals[("wind_actuals<br/>1,536 half-hourly rows")]
+        DB_Forecasts[("wind_forecasts<br/>18,664 hourly revisions")]
     end
 
     subgraph Backend["FastAPI Backend (backend/)"]

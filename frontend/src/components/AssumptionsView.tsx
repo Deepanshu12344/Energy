@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, Clock, Scale, ShieldCheck, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { Database, Clock, Scale, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 
 export const AssumptionsView: React.FC = () => {
@@ -7,6 +7,21 @@ export const AssumptionsView: React.FC = () => {
 
   const m = metrics?.metrics;
   const dist = distribution;
+
+  const overSharePct =
+    dist?.over_forecast_share !== undefined && dist?.over_forecast_share !== null
+      ? `${(dist.over_forecast_share * 100).toFixed(1)}%`
+      : null;
+
+  const biasFormatted =
+    m?.bias !== undefined && m?.bias !== null
+      ? `${m.bias > 0 ? '+' : ''}${m.bias.toLocaleString()} MW`
+      : null;
+
+  const p90Formatted =
+    m?.p90_abs_error !== undefined && m?.p90_abs_error !== null
+      ? `${m.p90_abs_error.toLocaleString()} MW`
+      : null;
 
   return (
     <div className="max-w-[1400px] mx-auto py-6 space-y-6">
@@ -16,36 +31,34 @@ export const AssumptionsView: React.FC = () => {
           System Assumptions & Methodology
         </h1>
         <p className="text-xs text-slate-500 dark:text-[#A3A3A3] mt-1">
-          Technical specifications, domain constraints, and evaluation methodology for UK National Grid Elexon wind data.
+          Technical specifications, domain constraints, and evaluation methodology for UK Elexon BMRS wind generation data.
         </p>
       </div>
 
       {/* Dynamic Key Finding Card */}
       <div className="bg-gradient-to-r from-blue-50/90 via-sky-50/60 to-white dark:from-[#141414] dark:via-[#1A1A1A] dark:to-[#141414] p-5 rounded-xl border border-blue-200/80 dark:border-[#2A2A2A] shadow-sm">
-        <div className="flex items-start gap-3.5">
-          <div className="p-2.5 rounded-lg bg-[#0B8FE3] text-white shrink-0 mt-0.5">
-            {/* <Sparkles className="w-5 h-5" /> */}
-          </div>
-          <div className="space-y-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#0B8FE3]">
-              Key Analytical Finding (January 2026)
-            </span>
-            <p className="text-sm font-medium text-slate-800 dark:text-white leading-relaxed">
-              At the 12:00 D-1 auction gate closure, National Grid WINDFOR forecasts were systematically higher than actual generation across{' '}
-              <strong className="text-slate-900 dark:text-white">
-                {dist?.over_forecast_share ? `${(dist.over_forecast_share * 100).toFixed(1)}%` : '85.2%'} of evaluated hours
-              </strong>{' '}
-              and on <strong className="text-slate-900 dark:text-white">29 of 31 days (93.5%)</strong>, with an average mean bias of{' '}
-              <strong className="text-[#0B8FE3] font-semibold">
-                {m?.bias ? `+${m.bias.toLocaleString()} MW` : '+1,805.86 MW'}
-              </strong>{' '}
-              and a P90 buffer threshold of{' '}
-              <strong className="text-slate-900 dark:text-white">
-                {m?.p90_abs_error ? `${m.p90_abs_error.toLocaleString()} MW` : '4,000.0 MW'}
-              </strong>
-              .
-            </p>
-          </div>
+        <div className="space-y-1.5">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#0B8FE3]">
+            Key Analytical Finding (January 2026)
+          </span>
+          <p className="text-sm font-medium text-slate-800 dark:text-white leading-relaxed">
+            At the 12:00 D-1 cutoff, Elexon WINDFOR forecasts were systematically higher than actual generation across{' '}
+            <strong className="text-slate-900 dark:text-white">
+              {overSharePct ? `${overSharePct} of evaluated hours` : 'evaluating...'}
+            </strong>{' '}
+            and on <strong className="text-slate-900 dark:text-white">29 of 31 delivery days (93.5%)</strong>, with an average mean bias of{' '}
+            <strong className="text-[#0B8FE3] font-semibold">
+              {biasFormatted ?? 'calculating...'}
+            </strong>{' '}
+            and a P90 buffer threshold of{' '}
+            <strong className="text-slate-900 dark:text-white">
+              {p90Formatted ?? 'calculating...'}
+            </strong>
+            .
+          </p>
+          <p className="text-xs text-slate-500 dark:text-[#A3A3A3] pt-0.5">
+            Decisions made in January 2026 are for delivery on 2 Jan through 1 Feb (D-1 decision window).
+          </p>
         </div>
       </div>
 
@@ -62,7 +75,7 @@ export const AssumptionsView: React.FC = () => {
               <strong>FUELHH (Actuals):</strong> Filtered exclusively for <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#1F1F1F] font-mono text-[11px]">fuelType = WIND</code> at 30-minute settlement granularity.
             </li>
             <li>
-              <strong>WINDFOR (Forecasts):</strong> National day-ahead wind generation forecasts published at hourly target resolution.
+              <strong>WINDFOR (Forecasts):</strong> National day-ahead wind generation forecasts published via Elexon BMRS at hourly target resolution.
             </li>
             <li>
               <strong>Pre-January Ingestion:</strong> December 2025 margin loaded to capture forecasts for early-January target hours.
@@ -78,7 +91,7 @@ export const AssumptionsView: React.FC = () => {
           </div>
           <ul className="text-xs text-slate-600 dark:text-[#A3A3A3] space-y-2 leading-relaxed">
             <li>
-              <strong>Default Cutoff:</strong> Set to <strong>12:00 Europe/London</strong> on Day D-1 (the GB Day-Ahead auction clearing gate).
+              <strong>Default Cutoff:</strong> Set to <strong>12:00 Europe/London</strong> on Day D-1 (industry benchmark; commercial GB day-ahead auctions close at 09:20 EPEX / 09:50 N2EX).
             </li>
             <li>
               <strong>Selection Criteria:</strong> For each settlement slot, selects the single forecast with greatest <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#1F1F1F] font-mono text-[11px]">publish_time &le; cutoff</code>.
@@ -116,7 +129,7 @@ export const AssumptionsView: React.FC = () => {
           </div>
           <ul className="text-xs text-slate-600 dark:text-[#A3A3A3] space-y-2 leading-relaxed">
             <li>
-              <strong>Lull Exclusion Threshold:</strong> Actual generation outturns below <strong>10.0 MW</strong> are excluded from the MAPE denominator to prevent division-by-zero distortion.
+              <strong>Low-Actual Exclusion Threshold:</strong> Actual generation outturns below <strong>10.0 MW</strong> are excluded from the MAPE denominator to prevent division-by-zero distortion.
             </li>
             <li>
               <strong>Full Coverage in MAE/RMSE:</strong> All evaluated hours remain included in MAE, RMSE, Bias, and percentiles.
@@ -130,29 +143,31 @@ export const AssumptionsView: React.FC = () => {
         {/* Card 5: Database Row Counts */}
         <div className="bg-white dark:bg-[#141414] rounded-xl border border-slate-200/80 dark:border-[#2A2A2A] p-5 shadow-sm space-y-3">
           <div className="flex items-center gap-2.5 text-[#0B8FE3]">
-            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            <CheckCircle2 className="w-5 h-5 text-[#0B8FE3]" />
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">5. Database Row Counts</h3>
           </div>
           <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-[#1A1A1A]">
               <span className="text-slate-500 dark:text-[#A3A3A3]">Actual Outturns (FUELHH):</span>
               <strong className="text-slate-900 dark:text-white font-mono">
-                {meta?.actual_rows_count ? `${meta.actual_rows_count.toLocaleString()} rows` : '1,488 rows'}
+                {meta?.actual_rows_count ? `${meta.actual_rows_count.toLocaleString()} rows` : '1,536 rows'}
               </strong>
             </div>
             <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-[#1A1A1A]">
               <span className="text-slate-500 dark:text-[#A3A3A3]">Forecasts (WINDFOR):</span>
               <strong className="text-slate-900 dark:text-white font-mono">
-                {meta?.forecast_rows_count ? `${meta.forecast_rows_count.toLocaleString()} rows` : '18,080 rows'}
+                {meta?.forecast_rows_count ? `${meta.forecast_rows_count.toLocaleString()} rows` : '18,664 rows'}
               </strong>
             </div>
             <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-[#1A1A1A]">
               <span className="text-slate-500 dark:text-[#A3A3A3]">Scope Window:</span>
-              <strong className="text-slate-900 dark:text-white">2026-01-01 to 2026-01-31</strong>
+              <strong className="text-slate-900 dark:text-white font-mono">
+                {meta ? `${meta.available_start_date} to ${meta.available_end_date}` : '2026-01-02 to 2026-02-01'}
+              </strong>
             </div>
             <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-[#1A1A1A]">
               <span className="text-slate-500 dark:text-[#A3A3A3]">Matching Strategy:</span>
-              <strong className="text-emerald-600 dark:text-emerald-400">exact_timestamp_match</strong>
+              <strong className="text-[#0B8FE3] dark:text-[#86C5EE] font-mono">exact_timestamp_match</strong>
             </div>
           </div>
         </div>
@@ -160,13 +175,13 @@ export const AssumptionsView: React.FC = () => {
         {/* Card 6: Negative Lead Time Policy */}
         <div className="bg-white dark:bg-[#141414] rounded-xl border border-slate-200/80 dark:border-[#2A2A2A] p-5 shadow-sm space-y-3">
           <div className="flex items-center gap-2.5 text-[#0B8FE3]">
-            <AlertCircle className="w-5 h-5 text-amber-500" />
+            <AlertCircle className="w-5 h-5 text-[#0B8FE3]" />
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">6. Negative Lead Times</h3>
           </div>
           <p className="text-xs text-slate-600 dark:text-[#A3A3A3] leading-relaxed">
-            In horizon analysis, forecasts published <em>after</em> the target delivery time (negative lead time) are segregated into a separate &ldquo;published after target&rdquo; bucket rather than skewing the main forward forecast buckets (&lt;12h, 12-18h, etc.).
+            Forecasts published after the target time are excluded from the forward-looking lead-time buckets.
           </p>
-          <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-[11px] text-amber-800 dark:text-amber-300">
+          <div className="p-2.5 rounded-lg bg-blue-50/80 dark:bg-blue-950/30 text-[11px] text-blue-800 dark:text-blue-300 border border-blue-100 dark:border-blue-900/30">
             Guarantees day-ahead forward purchase decisions are evaluated exclusively against genuine pre-delivery forecasts.
           </div>
         </div>

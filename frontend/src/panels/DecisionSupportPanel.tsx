@@ -1,13 +1,14 @@
 import React, { memo } from 'react';
 import { ShieldAlert, TrendingUp, Info } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
+import { formatDayMonth } from '../utils/dateFormatting';
 
 interface DecisionSupportPanelProps {
   isPreview?: boolean;
 }
 
 const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ isPreview = false }) => {
-  const { metrics, distribution, effectiveRange } = useDashboard();
+  const { metrics, distribution, effectiveRange, rangeMode, singleDate } = useDashboard();
   const m = metrics?.metrics;
   const dist = distribution;
 
@@ -26,6 +27,11 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
       ? (dist.over_forecast_share * 100).toFixed(1)
       : null;
 
+  const bufferPrefix =
+    rangeMode === 'single'
+      ? `On ${formatDayMonth(singleDate)}, in 9 of 10 hours the forecast was within`
+      : `Between ${formatDayMonth(effectiveRange.start)} and ${formatDayMonth(effectiveRange.end)}, in 9 of 10 hours the forecast was within`;
+
   return (
     <div className="w-full h-full flex flex-col justify-between space-y-3">
       {/* 9-of-10 Hours Recommended Buffer Card */}
@@ -39,7 +45,7 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
               Day-Ahead Buyer Buffer Guidance
             </h4>
             <p className="text-sm text-slate-800 dark:text-white leading-snug">
-              In 9 of 10 hours the forecast was within{' '}
+              {bufferPrefix}{' '}
               <strong className="text-slate-900 dark:text-white font-bold">
                 {p90Buffer.toLocaleString()} MW
               </strong>{' '}
@@ -56,11 +62,7 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
       {/* Systematic Bias Observation Card */}
       <div className="bg-slate-50 dark:bg-[#1A1A1A] rounded-xl p-4 border border-slate-100 dark:border-[#2A2A2A] flex-1 flex flex-col justify-center">
         <div className="flex items-start gap-3">
-          <div className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-            biasVal > 0
-              ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
-              : 'bg-blue-100 dark:bg-blue-950/60 text-[#0B8FE3]'
-          }`}>
+          <div className="p-2 rounded-lg shrink-0 mt-0.5 bg-blue-100 dark:bg-blue-950/60 text-[#0B8FE3]">
             <TrendingUp className="w-4 h-4" />
           </div>
           <div className="text-xs text-slate-600 dark:text-[#A3A3A3] space-y-1">
@@ -71,7 +73,7 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
               {biasVal > 0 ? (
                 <>
                   Average error was observed at{' '}
-                  <strong className="text-amber-600 dark:text-amber-400 font-semibold">
+                  <strong className="text-[#0B8FE3] dark:text-[#86C5EE] font-semibold">
                     +{biasVal.toLocaleString()} MW
                   </strong>
                   . Forecast was higher than actual in{' '}

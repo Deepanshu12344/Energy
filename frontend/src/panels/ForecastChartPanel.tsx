@@ -82,9 +82,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
             <span className="text-slate-500 dark:text-[#A3A3A3]">Error (F - A):</span>
             <span
               className={`font-semibold ${
-                data.error > 0
-                  ? 'text-amber-500'
-                  : data.error < 0
+                data.error !== 0
                   ? 'text-[#0B8FE3]'
                   : 'text-slate-700 dark:text-slate-300'
               }`}
@@ -146,14 +144,14 @@ const ForecastChartPanelComponent: React.FC<ForecastChartPanelProps> = ({ isPrev
       {/* Subtitle explicitly declaring delivery date and UTC */}
       {!isPreview && (
         <div className="flex items-center justify-between text-xs text-slate-400 dark:text-[#737373] mb-3">
-          <span>Delivery: <strong className="text-slate-700 dark:text-slate-300">{singleDate}</strong></span>
+          <span>Day shown: <strong className="text-slate-700 dark:text-slate-300">{singleDate}</strong></span>
           <span>Axis: <strong className="text-slate-700 dark:text-slate-300">UTC</strong></span>
         </div>
       )}
 
       <div className="flex-1 w-full min-h-[160px]">
         <ResponsiveContainer width="100%" height="100%" debounce={100}>
-          <LineChart data={chartData} margin={{ top: 10, right: 15, left: -10, bottom: 0 }}>
+          <LineChart data={chartData} margin={{ top: 10, right: 15, left: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
             <XAxis
               dataKey="time"
@@ -166,7 +164,15 @@ const ForecastChartPanelComponent: React.FC<ForecastChartPanelProps> = ({ isPrev
               stroke={axisColor}
               fontSize={11}
               tickLine={false}
-              tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`}
+              tickFormatter={(val) => Number(val).toLocaleString()}
+              label={{
+                value: 'MW',
+                angle: -90,
+                position: 'insideLeft',
+                offset: -2,
+                style: { textAnchor: 'middle', fill: axisColor, fontSize: 11, fontWeight: 600 },
+              }}
+              width={60}
             />
             {!isPreview && <Tooltip content={<CustomTooltip />} />}
             {/* 30-min actuals: Solid line with markers */}
