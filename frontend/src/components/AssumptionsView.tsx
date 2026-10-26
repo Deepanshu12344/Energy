@@ -24,7 +24,7 @@ export const AssumptionsView: React.FC = () => {
       <div className="bg-gradient-to-r from-blue-50/90 via-sky-50/60 to-white dark:from-[#141414] dark:via-[#1A1A1A] dark:to-[#141414] p-5 rounded-xl border border-blue-200/80 dark:border-[#2A2A2A] shadow-sm">
         <div className="flex items-start gap-3.5">
           <div className="p-2.5 rounded-lg bg-[#0B8FE3] text-white shrink-0 mt-0.5">
-            <Sparkles className="w-5 h-5" />
+            {/* <Sparkles className="w-5 h-5" /> */}
           </div>
           <div className="space-y-1">
             <span className="text-xs font-bold uppercase tracking-wider text-[#0B8FE3]">
