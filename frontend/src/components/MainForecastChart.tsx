@@ -52,7 +52,7 @@ const ForecastTooltipContent: React.FC<ForecastTooltipProps> = ({
         </span>
       </div>
 
-      <div className="flex justify-between items-center text-emerald-400">
+      <div className="flex justify-between items-center text-[#0B8FE3]">
         <span>Actual Generation:</span>
         <span className="font-bold">
           {item?.actual_mw !== null && item?.actual_mw !== undefined
@@ -61,7 +61,7 @@ const ForecastTooltipContent: React.FC<ForecastTooltipProps> = ({
         </span>
       </div>
 
-      <div className="flex justify-between items-center text-amber-400">
+      <div className="flex justify-between items-center text-[#86C5EE]">
         <span>Day-Ahead Forecast:</span>
         <span className="font-bold">
           {item?.forecast_mw !== null && item?.forecast_mw !== undefined
@@ -76,9 +76,7 @@ const ForecastTooltipContent: React.FC<ForecastTooltipProps> = ({
         <div className="border-t border-slate-800/80 pt-1 flex justify-between items-center">
           <span className="text-slate-400">Error (F - A):</span>
           <span
-            className={`font-mono font-semibold ${
-              item.error_mw > 0 ? 'text-amber-400' : 'text-blue-400'
-            }`}
+            className="font-mono font-semibold text-[#0B8FE3]"
           >
             {item.error_mw > 0 ? `+${Math.round(item.error_mw)}` : Math.round(item.error_mw)} MW
           </span>
@@ -122,7 +120,7 @@ export const MainForecastChart: React.FC<MainForecastChartProps> = ({
   if (isLoading) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg h-96 flex flex-col justify-center items-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-400 mb-3" />
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0B8FE3] mb-3" />
         <span className="text-sm text-slate-400">Loading forecast & actual generation series...</span>
       </div>
     );
@@ -185,19 +183,19 @@ export const MainForecastChart: React.FC<MainForecastChartProps> = ({
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
       {/* Cutoff Banner above the chart */}
-      <div className="mb-4 bg-slate-950/80 border border-amber-500/30 rounded-lg px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-inner">
+      <div className="mb-4 bg-slate-950/80 border border-blue-500/30 rounded-lg px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-inner">
         <div className="flex items-center space-x-2.5">
-          <div className="p-1.5 bg-amber-500/10 text-amber-400 rounded-md">
+          <div className="p-1.5 bg-blue-500/10 text-[#0B8FE3] rounded-md">
             <Clock className="w-4 h-4" />
           </div>
           <div className="text-xs">
             <span className="text-slate-400">D-1 Decision Cutoff: </span>
-            <span className="font-semibold text-amber-300 font-mono">{cutoffFormatted}</span>
+            <span className="font-semibold text-blue-300 font-mono">{cutoffFormatted}</span>
           </div>
         </div>
 
         <div className="flex items-center space-x-2 text-[11px] text-slate-400">
-          <Eye className="w-3.5 h-3.5 text-emerald-400" />
+          <Eye className="w-3.5 h-3.5 text-[#0B8FE3]" />
           <span>Latest WINDFOR revisions published at or before cutoff</span>
         </div>
       </div>
@@ -215,11 +213,11 @@ export const MainForecastChart: React.FC<MainForecastChartProps> = ({
 
         <div className="flex items-center space-x-4 text-xs">
           <div className="flex items-center space-x-1.5">
-            <span className="w-3 h-0.5 bg-emerald-400 rounded" />
+            <span className="w-3 h-0.5 bg-[#0B8FE3] rounded" />
             <span className="text-slate-300">Actual Outturn (30-min)</span>
           </div>
           <div className="flex items-center space-x-1.5">
-            <span className="w-3 h-0.5 border-b-2 border-dashed border-amber-400" />
+            <span className="w-3 h-0.5 border-b-2 border-dashed border-[#86C5EE]" />
             <span className="text-slate-300">Day-Ahead Forecast (Hourly)</span>
           </div>
         </div>
@@ -259,10 +257,10 @@ export const MainForecastChart: React.FC<MainForecastChartProps> = ({
               data={actualsSeries}
               dataKey="actual_mw"
               name="Actual Generation (FUELHH, 30m)"
-              stroke="#10b981"
+              stroke="#0B8FE3"
               strokeWidth={2.5}
               dot={false}
-              activeDot={{ r: 5, fill: '#10b981', stroke: '#064e3b', strokeWidth: 2 }}
+              activeDot={{ r: 5, fill: '#0B8FE3', stroke: '#086cb0', strokeWidth: 2 }}
               isAnimationActive={false}
             />
 
@@ -271,11 +269,11 @@ export const MainForecastChart: React.FC<MainForecastChartProps> = ({
               data={forecastsSeries}
               dataKey="forecast_mw"
               name="Day-Ahead Forecast (WINDFOR, 1h)"
-              stroke="#f59e0b"
+              stroke="#86C5EE"
               strokeWidth={2}
               strokeDasharray="5 5"
-              dot={{ r: 3.5, fill: '#f59e0b', stroke: '#78350f', strokeWidth: 1 }}
-              activeDot={{ r: 6, fill: '#f59e0b', stroke: '#ffffff', strokeWidth: 2 }}
+              dot={{ r: 3.5, fill: '#86C5EE', stroke: '#5faedb', strokeWidth: 1 }}
+              activeDot={{ r: 6, fill: '#86C5EE', stroke: '#ffffff', strokeWidth: 2 }}
               isAnimationActive={false}
             />
           </LineChart>

@@ -70,7 +70,7 @@ export const HourlyErrorChart: React.FC<HourlyErrorChartProps> = ({
   if (isLoading) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 h-80 flex flex-col justify-center items-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mb-2" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0B8FE3] mb-2" />
         <span className="text-xs text-slate-400">Loading hourly error breakdown...</span>
       </div>
     );
@@ -141,9 +141,9 @@ export const HourlyErrorChart: React.FC<HourlyErrorChartProps> = ({
               type="monotone"
               dataKey="bias"
               name="Mean Bias (Forecast - Actual)"
-              stroke="#f59e0b"
+              stroke="#0B8FE3"
               strokeWidth={2}
-              dot={{ r: 3, fill: '#f59e0b' }}
+              dot={{ r: 3, fill: '#0B8FE3' }}
             />
           </ComposedChart>
         </ResponsiveContainer>

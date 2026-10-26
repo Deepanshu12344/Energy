@@ -40,7 +40,7 @@ const HistogramTooltipContent: React.FC<HistogramTooltipProps> = ({
   return (
     <div className="bg-slate-950/95 border border-slate-700/80 p-2.5 rounded-lg text-xs shadow-xl backdrop-blur-md">
       <div className="font-semibold text-slate-200">{item.label}</div>
-      <div className="text-emerald-400 mt-1">
+      <div className="text-[#0B8FE3] mt-1">
         Frequency: <strong>{item.count} hours</strong> ({pct}%)
       </div>
       <div className="text-[11px] text-slate-400 mt-0.5">
@@ -62,7 +62,7 @@ export const ErrorHistogramChart: React.FC<ErrorHistogramChartProps> = ({
   if (isLoading) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 h-80 flex flex-col justify-center items-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mb-2" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0B8FE3] mb-2" />
         <span className="text-xs text-slate-400">Loading error distribution...</span>
       </div>
     );
@@ -93,7 +93,7 @@ export const ErrorHistogramChart: React.FC<ErrorHistogramChartProps> = ({
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 gap-2">
         <div className="flex items-center space-x-2">
-          <div className="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg">
+          <div className="p-1.5 bg-blue-500/10 text-[#0B8FE3] rounded-lg">
             <BarChart2 className="w-4 h-4" />
           </div>
           <div>
@@ -108,7 +108,7 @@ export const ErrorHistogramChart: React.FC<ErrorHistogramChartProps> = ({
 
         <div className="flex items-center space-x-2 text-xs bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
           <span className="text-slate-400">Over-forecast share:</span>
-          <span className="font-bold text-amber-400">
+          <span className="font-bold text-[#0B8FE3]">
             {overForecastSharePct}% of hours
           </span>
         </div>
@@ -138,7 +138,7 @@ export const ErrorHistogramChart: React.FC<ErrorHistogramChartProps> = ({
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.isOverForecast ? '#f59e0b' : '#38bdf8'}
+                  fill={entry.isOverForecast ? '#0B8FE3' : '#86C5EE'}
                 />
               ))}
             </Bar>
@@ -149,11 +149,11 @@ export const ErrorHistogramChart: React.FC<ErrorHistogramChartProps> = ({
       <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-2">
         <div className="flex items-center space-x-3">
           <span className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 bg-sky-400 rounded-sm" />
+            <span className="w-2.5 h-2.5 bg-[#86C5EE] rounded-sm" />
             <span>Under-forecast (F &lt; A)</span>
           </span>
           <span className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 bg-amber-400 rounded-sm" />
+            <span className="w-2.5 h-2.5 bg-[#0B8FE3] rounded-sm" />
             <span>Over-forecast (F &gt; A)</span>
           </span>
         </div>

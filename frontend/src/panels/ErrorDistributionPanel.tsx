@@ -147,7 +147,7 @@ const ErrorDistributionPanelComponent: React.FC<ErrorDistributionPanelProps> = (
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.isOver ? '#F59E0B' : '#0B8FE3'}
+                  fill={entry.isOver ? '#0B8FE3' : '#86C5EE'}
                 />
               ))}
             </Bar>
@@ -158,11 +158,11 @@ const ErrorDistributionPanelComponent: React.FC<ErrorDistributionPanelProps> = (
       {/* Screenshot-Style Legend */}
       <div className="flex items-center justify-center gap-6 mt-2 pt-2 border-t border-slate-100 dark:border-[#2A2A2A] text-xs font-medium text-slate-600 dark:text-[#A3A3A3]">
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#F59E0B]" />
+          <span className="w-3 h-3 rounded-sm bg-[#0B8FE3]" />
           <span>Over-forecast (F &gt; A)</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#0B8FE3]" />
+          <span className="w-3 h-3 rounded-sm bg-[#86C5EE]" />
           <span>Under-forecast (F &lt; A)</span>
         </div>
       </div>

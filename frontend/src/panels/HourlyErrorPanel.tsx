@@ -54,7 +54,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
             <span className="w-2.5 h-2.5 rounded-full bg-[#0B8FE3]" />
             Mean Bias:
           </span>
-          <strong className={d.bias > 0 ? 'text-amber-500' : 'text-[#0B8FE3]'}>
+          <strong className="text-[#0B8FE3]">
             {d.bias > 0 ? `+${d.bias.toLocaleString()}` : d.bias.toLocaleString()} MW
           </strong>
         </div>

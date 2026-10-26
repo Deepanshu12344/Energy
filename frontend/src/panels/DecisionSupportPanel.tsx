@@ -62,11 +62,7 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
       {/* Systematic Bias Observation Card */}
       <div className="bg-slate-50 dark:bg-[#1A1A1A] rounded-xl p-4 border border-slate-100 dark:border-[#2A2A2A] flex-1 flex flex-col justify-center">
         <div className="flex items-start gap-3">
-          <div className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-            biasVal > 0
-              ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
-              : 'bg-blue-100 dark:bg-blue-950/60 text-[#0B8FE3]'
-          }`}>
+          <div className="p-2 rounded-lg shrink-0 mt-0.5 bg-blue-100 dark:bg-blue-950/60 text-[#0B8FE3]">
             <TrendingUp className="w-4 h-4" />
           </div>
           <div className="text-xs text-slate-600 dark:text-[#A3A3A3] space-y-1">
@@ -77,7 +73,7 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
               {biasVal > 0 ? (
                 <>
                   Average error was observed at{' '}
-                  <strong className="text-amber-600 dark:text-amber-400 font-semibold">
+                  <strong className="text-[#0B8FE3] dark:text-[#86C5EE] font-semibold">
                     +{biasVal.toLocaleString()} MW
                   </strong>
                   . Forecast was higher than actual in{' '}

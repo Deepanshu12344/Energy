@@ -65,7 +65,7 @@ export const Controls: React.FC<ControlsProps> = ({
             onClick={() => onRangeModeChange('single')}
             className={`px-3 py-1.5 rounded-md transition-all ${
               rangeMode === 'single'
-                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                ? 'bg-[#0B8FE3] text-white shadow-sm font-semibold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -76,7 +76,7 @@ export const Controls: React.FC<ControlsProps> = ({
             onClick={() => onRangeModeChange('full')}
             className={`px-3 py-1.5 rounded-md transition-all ${
               rangeMode === 'full'
-                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                ? 'bg-[#0B8FE3] text-white shadow-sm font-semibold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -87,7 +87,7 @@ export const Controls: React.FC<ControlsProps> = ({
             onClick={() => onRangeModeChange('custom')}
             className={`px-3 py-1.5 rounded-md transition-all ${
               rangeMode === 'custom'
-                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                ? 'bg-[#0B8FE3] text-white shadow-sm font-semibold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -110,7 +110,7 @@ export const Controls: React.FC<ControlsProps> = ({
               </button>
 
               <div className="flex items-center space-x-2 px-2">
-                <Calendar className="w-4 h-4 text-emerald-400" />
+                <Calendar className="w-4 h-4 text-[#0B8FE3]" />
                 <span className="text-xs text-slate-400">Date:</span>
                 <input
                   type="date"
@@ -119,7 +119,7 @@ export const Controls: React.FC<ControlsProps> = ({
                   max={maxDate}
                   onChange={(e) => onSingleDateChange(e.target.value)}
                   disabled={isLoading}
-                  className="bg-transparent text-sm text-slate-100 font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 rounded px-1"
+                  className="bg-transparent text-sm text-slate-100 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-1"
                 />
               </div>
 
@@ -137,7 +137,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
           {rangeMode === 'custom' && (
             <div className="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-              <Calendar className="w-4 h-4 text-emerald-400" />
+              <Calendar className="w-4 h-4 text-[#0B8FE3]" />
               <div className="flex items-center space-x-1 text-xs">
                 <span className="text-slate-400">From:</span>
                 <input
@@ -147,7 +147,7 @@ export const Controls: React.FC<ControlsProps> = ({
                   max={endDate || maxDate}
                   onChange={(e) => onStartDateChange(e.target.value)}
                   disabled={isLoading}
-                  className="bg-transparent text-sm text-slate-100 font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 rounded px-1"
+                  className="bg-transparent text-sm text-slate-100 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-1"
                 />
                 <span className="text-slate-500 mx-1">→</span>
                 <span className="text-slate-400">To:</span>
@@ -158,7 +158,7 @@ export const Controls: React.FC<ControlsProps> = ({
                   max={maxDate}
                   onChange={(e) => onEndDateChange(e.target.value)}
                   disabled={isLoading}
-                  className="bg-transparent text-sm text-slate-100 font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 rounded px-1"
+                  className="bg-transparent text-sm text-slate-100 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-1"
                 />
               </div>
             </div>
@@ -166,14 +166,14 @@ export const Controls: React.FC<ControlsProps> = ({
 
           {rangeMode === 'full' && (
             <div className="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 text-xs text-slate-300">
-              <Calendar className="w-4 h-4 text-emerald-400" />
+              <Calendar className="w-4 h-4 text-[#0B8FE3]" />
               <span>Evaluating all 31 delivery days: <strong>2026-01-01 to 2026-01-31</strong> (744 hours)</span>
             </div>
           )}
 
           {/* D-1 Cutoff Time Input */}
           <div className="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-            <Clock className="w-4 h-4 text-amber-400" />
+            <Clock className="w-4 h-4 text-[#0B8FE3]" />
             <div className="flex items-center space-x-1.5">
               <span className="text-xs text-slate-400">D-1 Cutoff:</span>
               <input
@@ -184,7 +184,7 @@ export const Controls: React.FC<ControlsProps> = ({
                 placeholder="12:00"
                 disabled={isLoading}
                 title="D-1 decision cutoff time in Europe/London (HH:MM)"
-                className="w-14 bg-slate-900 border border-slate-700 text-slate-100 text-center text-xs font-mono py-1 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="w-14 bg-slate-900 border border-slate-700 text-slate-100 text-center text-xs font-mono py-1 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <span className="text-[11px] text-slate-500">London</span>
             </div>

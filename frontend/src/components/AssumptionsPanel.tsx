@@ -18,7 +18,7 @@ export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({ meta, cutoff
         className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-slate-800/40 transition-colors"
       >
         <div className="flex items-center space-x-2.5">
-          <FileText className="w-4 h-4 text-emerald-400" />
+          <FileText className="w-4 h-4 text-[#0B8FE3]" />
           <span className="text-sm font-semibold text-slate-200">
             Methodology, System Assumptions & Data Provenance
           </span>
@@ -37,7 +37,7 @@ export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({ meta, cutoff
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* 1. Decision Cutoff & Market Timing */}
             <div className="bg-slate-950/70 p-3.5 rounded-lg border border-slate-800">
-              <div className="flex items-center space-x-2 text-amber-400 font-semibold mb-1.5">
+              <div className="flex items-center space-x-2 text-blue-400 font-semibold mb-1.5">
                 <Shield className="w-3.5 h-3.5" />
                 <span>Trading Cutoff Rule</span>
               </div>
@@ -60,7 +60,7 @@ export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({ meta, cutoff
 
             {/* 3. MAPE Near-Zero Guard */}
             <div className="bg-slate-950/70 p-3.5 rounded-lg border border-slate-800">
-              <div className="flex items-center space-x-2 text-emerald-400 font-semibold mb-1.5">
+              <div className="flex items-center space-x-2 text-blue-400 font-semibold mb-1.5">
                 <Shield className="w-3.5 h-3.5" />
                 <span>Zero-Division MAPE Guard</span>
               </div>

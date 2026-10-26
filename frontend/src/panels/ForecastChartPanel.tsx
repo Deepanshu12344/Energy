@@ -82,9 +82,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
             <span className="text-slate-500 dark:text-[#A3A3A3]">Error (F - A):</span>
             <span
               className={`font-semibold ${
-                data.error > 0
-                  ? 'text-amber-500'
-                  : data.error < 0
+                data.error !== 0
                   ? 'text-[#0B8FE3]'
                   : 'text-slate-700 dark:text-slate-300'
               }`}

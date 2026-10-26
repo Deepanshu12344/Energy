@@ -81,13 +81,11 @@ export const KPICards: React.FC<KPICardsProps> = ({ metrics, isLoading }) => {
         <div className="flex items-center justify-between text-slate-400 mb-1.5">
           <span className="text-xs font-medium uppercase tracking-wider">Mean Bias</span>
           <AlertTriangle
-            className={`w-4 h-4 ${isOverForecasting ? 'text-amber-400' : 'text-blue-400'}`}
+            className="w-4 h-4 text-[#0B8FE3]"
           />
         </div>
         <div
-          className={`text-xl font-bold tracking-tight ${
-            isOverForecasting ? 'text-amber-400' : 'text-blue-400'
-          }`}
+          className="text-xl font-bold tracking-tight text-[#0B8FE3]"
         >
           {metrics.bias !== null && metrics.bias !== undefined
             ? `${metrics.bias > 0 ? '+' : ''}${Math.round(metrics.bias).toLocaleString()} MW`
@@ -95,11 +93,7 @@ export const KPICards: React.FC<KPICardsProps> = ({ metrics, isLoading }) => {
         </div>
         <div className="mt-1 flex items-center">
           <span
-            className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-              isOverForecasting
-                ? 'bg-amber-950/80 text-amber-300 border border-amber-800/60'
-                : 'bg-blue-950/80 text-blue-300 border border-blue-800/60'
-            }`}
+            className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-950/80 text-blue-300 border border-blue-800/60"
           >
             {isOverForecasting ? 'Over-forecast (F > A)' : 'Under-forecast (F < A)'}
           </span>
@@ -110,7 +104,7 @@ export const KPICards: React.FC<KPICardsProps> = ({ metrics, isLoading }) => {
       <div className="bg-slate-900 border border-slate-800/80 rounded-xl p-3.5 shadow-sm hover:border-slate-700 transition-colors">
         <div className="flex items-center justify-between text-slate-400 mb-1.5">
           <span className="text-xs font-medium uppercase tracking-wider">MAPE</span>
-          <Percent className="w-4 h-4 text-emerald-400" />
+          <Percent className="w-4 h-4 text-[#0B8FE3]" />
         </div>
         <div className="text-xl font-bold text-white tracking-tight">
           {formatPct(metrics.mape)}

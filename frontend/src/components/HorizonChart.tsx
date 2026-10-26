@@ -41,7 +41,7 @@ const HorizonTooltipContent: React.FC<HorizonTooltipProps> = ({ active, payload 
       <div className="text-slate-300">
         RMSE: <strong>{item.rmse.toLocaleString()} MW</strong>
       </div>
-      <div className="text-amber-400">
+      <div className="text-[#0B8FE3]">
         Bias: <strong>{item.bias > 0 ? `+${item.bias}` : item.bias} MW</strong>
       </div>
       <div className="text-[10px] text-slate-400 mt-1">
@@ -60,7 +60,7 @@ export const HorizonChart: React.FC<HorizonChartProps> = ({ horizonData, isLoadi
   if (isLoading) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 h-80 flex flex-col justify-center items-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mb-2" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0B8FE3] mb-2" />
         <span className="text-xs text-slate-400">Loading lead time horizon analysis...</span>
       </div>
     );
@@ -131,7 +131,7 @@ export const HorizonChart: React.FC<HorizonChartProps> = ({ horizonData, isLoadi
       {afterTarget && afterTarget.count > 0 && (
         <div className="mt-4 bg-slate-950 border border-slate-800 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
           <div className="flex items-start sm:items-center space-x-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
+            <AlertTriangle className="w-4 h-4 text-[#0B8FE3] shrink-0 mt-0.5 sm:mt-0" />
             <div>
               <span className="font-semibold text-slate-200">
                 Segregated: Forecasts published after delivery time (negative lead time)
@@ -144,7 +144,7 @@ export const HorizonChart: React.FC<HorizonChartProps> = ({ horizonData, isLoadi
           <div className="flex items-center space-x-3 text-slate-300 font-mono text-[11px] self-end sm:self-auto">
             <span>Count: <strong className="text-white">{afterTarget.count}</strong></span>
             <span>MAE: <strong className="text-white">{Math.round(afterTarget.mae ?? 0)} MW</strong></span>
-            <span>Bias: <strong className="text-amber-400">{Math.round(afterTarget.bias ?? 0)} MW</strong></span>
+            <span>Bias: <strong className="text-[#0B8FE3]">{Math.round(afterTarget.bias ?? 0)} MW</strong></span>
           </div>
         </div>
       )}

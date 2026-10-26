@@ -167,9 +167,7 @@ const DataTablePanelComponent: React.FC<DataTablePanelProps> = ({
                       {row.error_mw !== null ? (
                         <span
                           className={
-                            isOver
-                              ? 'text-amber-500'
-                              : isUnder
+                            isOver || isUnder
                               ? 'text-[#0B8FE3]'
                               : 'text-slate-600 dark:text-[#A3A3A3]'
                           }

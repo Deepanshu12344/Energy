@@ -10,7 +10,7 @@ interface MetricTileProps {
   subtext?: string;
   badge?: {
     text: string;
-    variant: 'blue' | 'amber' | 'slate';
+    variant?: 'blue' | 'slate';
   };
   isPreview?: boolean;
 }
@@ -59,15 +59,7 @@ const MetricTile: React.FC<MetricTileProps> = ({
     <div className="flex items-center justify-between mt-0.5 text-[10px] sm:text-[11px]">
       {subtext && <span className="text-slate-400 dark:text-[#737373] truncate">{subtext}</span>}
       {badge && (
-        <span
-          className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-            badge.variant === 'amber'
-              ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400'
-              : badge.variant === 'blue'
-              ? 'bg-blue-50 text-[#0B8FE3] dark:bg-blue-950/40 dark:text-[#86C5EE]'
-              : 'bg-slate-100 text-slate-600 dark:bg-[#2A2A2A] dark:text-[#A3A3A3]'
-          }`}
-        >
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-[#0B8FE3] dark:bg-blue-950/40 dark:text-[#86C5EE] border border-blue-100/60 dark:border-blue-900/30">
           {badge.text}
         </span>
       )}
@@ -125,7 +117,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           tooltip="Average error (Forecast - Actual). Positive means forecasts persistently exceed actual generation."
           badge={{
             text: biasLabel,
-            variant: m.bias !== null && m.bias > 0 ? 'amber' : 'blue',
+            variant: 'blue',
           }}
           isPreview={isPreview}
         />
@@ -157,7 +149,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           tooltip="Evaluated hourly settlement slots where both actuals and cutoff-compliant forecasts were matched."
           badge={{
             text: m.missing_slots === 0 ? '100% Coverage' : `${m.missing_slots} Missing`,
-            variant: m.missing_slots === 0 ? 'blue' : 'amber',
+            variant: 'blue',
           }}
           isPreview={isPreview}
         />
