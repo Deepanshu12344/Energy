@@ -1,237 +1,118 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { apiClient, ApiError } from './api/client';
-import type {
-  HealthResponse,
-  MetaResponse,
-  ForecastComparisonResponse,
-  MetricsResponse,
-  ErrorByHourResponse,
-  HorizonAnalysisResponse,
-  ErrorDistributionResponse,
-} from './api/types';
-import { Header } from './components/Header';
-import { Controls, type RangeMode } from './components/Controls';
-import { KPICards } from './components/KPICards';
-import { DecisionSupportCard } from './components/DecisionSupportCard';
-import { MainForecastChart } from './components/MainForecastChart';
-import { ErrorHistogramChart } from './components/ErrorHistogramChart';
-import { HourlyErrorChart } from './components/HourlyErrorChart';
-import { HorizonChart } from './components/HorizonChart';
-import { AssumptionsPanel } from './components/AssumptionsPanel';
-import { ErrorAlert } from './components/ErrorAlert';
+import React from 'react';
+import { Plus, Trash2 } from 'lucide-react';
+import { ThemeProvider } from './context/ThemeContext';
+import { DashboardProvider, useDashboard } from './context/DashboardContext';
+import { Navbar } from './layout/Navbar';
+import { FilterBar } from './layout/FilterBar';
+import { DashboardGrid } from './layout/DashboardGrid';
+import { AssumptionsView } from './components/AssumptionsView';
+import { AddPanelModal } from './layout/AddPanelModal';
+import { ConfirmModal } from './layout/ConfirmModal';
+import { ExpandModal } from './layout/ExpandModal';
+import { ForecastChartPanel } from './panels/ForecastChartPanel';
+import { MetricsPanel } from './panels/MetricsPanel';
+import { DecisionSupportPanel } from './panels/DecisionSupportPanel';
+import { ErrorDistributionPanel } from './panels/ErrorDistributionPanel';
+import { OverUnderPiePanel } from './panels/OverUnderPiePanel';
+import { HourlyErrorPanel } from './panels/HourlyErrorPanel';
+import { HorizonPanel } from './panels/HorizonPanel';
+import { DataTablePanel } from './panels/DataTablePanel';
+import type { PanelId } from './registry/panelRegistry';
 
-export const App: React.FC = () => {
-  // Navigation & Parameter States
-  const [rangeMode, setRangeMode] = useState<RangeMode>('single');
-  const [singleDate, setSingleDate] = useState<string>('2026-01-15');
-  const [startDate, setStartDate] = useState<string>('2026-01-01');
-  const [endDate, setEndDate] = useState<string>('2026-01-31');
-  const [cutoffTime, setCutoffTime] = useState<string>('12:00');
+const DashboardContent: React.FC = () => {
+  const { activeTab, setIsAddModalOpen, setIsResetConfirmOpen } = useDashboard();
 
-  // API Data States
-  const [health, setHealth] = useState<HealthResponse | null>(null);
-  const [meta, setMeta] = useState<MetaResponse | null>(null);
-  const [comparison, setComparison] = useState<ForecastComparisonResponse | null>(null);
-  const [metricsResponse, setMetricsResponse] = useState<MetricsResponse | null>(null);
-  const [hourlyError, setHourlyError] = useState<ErrorByHourResponse | null>(null);
-  const [horizonAnalysis, setHorizonAnalysis] = useState<HorizonAnalysisResponse | null>(null);
-  const [distribution, setDistribution] = useState<ErrorDistributionResponse | null>(null);
-
-  // Status & Loading States
-  const [loadingHealth, setLoadingHealth] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [errorDetail, setErrorDetail] = useState<string | null>(null);
-
-  // Initial load: Fetch health and metadata
-  useEffect(() => {
-    let isMounted = true;
-    const fetchInitialMeta = async () => {
-      try {
-        setLoadingHealth(true);
-        const [h, m] = await Promise.all([apiClient.getHealth(), apiClient.getMeta()]);
-        if (isMounted) {
-          setHealth(h);
-          setMeta(m);
-        }
-      } catch {
-        if (isMounted) {
-          setHealth({ status: 'degraded', database_connected: false, timestamp: new Date().toISOString() });
-        }
-      } finally {
-        if (isMounted) setLoadingHealth(false);
-      }
-    };
-
-    fetchInitialMeta();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Compute effective evaluation date range based on rangeMode
-  const getEffectiveRange = useCallback((): { start: string; end: string; label: string } => {
-    if (rangeMode === 'single') {
-      return { start: singleDate, end: singleDate, label: `Delivery Day: ${singleDate}` };
+  // Helper to render panel for enlarged expand modal
+  const renderExpandedPanel = (id: PanelId) => {
+    switch (id) {
+      case 'forecast':
+        return <ForecastChartPanel />;
+      case 'metrics':
+        return <MetricsPanel />;
+      case 'decision':
+        return <DecisionSupportPanel />;
+      case 'distribution':
+        return <ErrorDistributionPanel />;
+      case 'pie':
+        return <OverUnderPiePanel />;
+      case 'hourly':
+        return <HourlyErrorPanel />;
+      case 'horizon':
+        return <HorizonPanel />;
+      case 'table':
+        return <DataTablePanel />;
+      default:
+        return null;
     }
-    if (rangeMode === 'full') {
-      return { start: '2026-01-01', end: '2026-01-31', label: 'Full Month: January 2026' };
-    }
-    return { start: startDate, end: endDate, label: `Custom Range: ${startDate} to ${endDate}` };
-  }, [rangeMode, singleDate, startDate, endDate]);
-
-  // Main data loader function
-  const loadDashboardData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    setErrorDetail(null);
-
-    const { start, end } = getEffectiveRange();
-
-    try {
-      const [
-        forecastRes,
-        metricsRes,
-        hourlyRes,
-        horizonRes,
-        distributionRes,
-      ] = await Promise.all([
-        apiClient.getForecast(singleDate, cutoffTime),
-        apiClient.getMetrics(start, end, cutoffTime),
-        apiClient.getErrorByHour(start, end, cutoffTime),
-        apiClient.getHorizonAnalysis(start, end),
-        apiClient.getErrorDistribution(start, end, cutoffTime),
-      ]);
-
-      setComparison(forecastRes);
-      setMetricsResponse(metricsRes);
-      setHourlyError(hourlyRes);
-      setHorizonAnalysis(horizonRes);
-      setDistribution(distributionRes);
-    } catch (err: unknown) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-        setErrorDetail(err.errorDetail);
-      } else if (err instanceof Error) {
-        setError('Failed to load dashboard data');
-        setErrorDetail(err.message);
-      } else {
-        setError('Failed to load dashboard data');
-        setErrorDetail('Check backend server connection at ' + apiClient.getBaseUrl());
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [getEffectiveRange, singleDate, cutoffTime]);
-
-  // Trigger load when parameters change
-  useEffect(() => {
-    queueMicrotask(() => {
-      void loadDashboardData();
-    });
-  }, [loadDashboardData]);
-
-  const { label: rangeLabel } = getEffectiveRange();
+  };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30">
-      {/* Header */}
-      <Header
-        health={health}
-        loadingHealth={loadingHealth}
-        onRefresh={loadDashboardData}
-      />
+    <div className="min-h-screen bg-[#F5F7FA] dark:bg-[#0B0F19] transition-colors flex flex-col font-sans selection:bg-[#0B8FE3]/20">
+      {/* Top Navigation Bar */}
+      <Navbar />
 
-      {/* Main Container */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex-1 space-y-5">
-        {/* Error Alert */}
-        {error && (
-          <ErrorAlert
-            error={error}
-            detail={errorDetail}
-            onRetry={loadDashboardData}
-          />
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-6">
+        {activeTab === 'dashboard' ? (
+          <>
+            {/* Dashboard Title & Actions Row (Matching RAW screenshot) */}
+            <div className="flex items-center justify-between mb-5">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Dashboard
+              </h1>
+
+              <div className="flex items-center gap-2.5">
+                {/* Blue "+ Add Panel" Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#0B8FE3] hover:bg-[#097ec9] text-white shadow-sm transition active:scale-[0.98]"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Panel</span>
+                </button>
+
+                {/* Trash Icon Button to Reset Layout */}
+                <button
+                  type="button"
+                  onClick={() => setIsResetConfirmOpen(true)}
+                  title="Reset dashboard layout to default"
+                  aria-label="Reset layout"
+                  className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50/50 dark:hover:bg-rose-950/30 transition"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Global Filter Bar */}
+            <FilterBar />
+
+            {/* Draggable & Resizable Grid */}
+            <DashboardGrid />
+          </>
+        ) : (
+          /* Assumptions Page */
+          <AssumptionsView />
         )}
-
-        {/* Global Controls & Filters */}
-        <Controls
-          rangeMode={rangeMode}
-          onRangeModeChange={setRangeMode}
-          singleDate={singleDate}
-          onSingleDateChange={setSingleDate}
-          startDate={startDate}
-          onStartDateChange={setStartDate}
-          endDate={endDate}
-          onEndDateChange={setEndDate}
-          cutoffTime={cutoffTime}
-          onCutoffTimeChange={setCutoffTime}
-          isLoading={isLoading}
-        />
-
-        {/* Executive Decision Support Summary Card */}
-        <DecisionSupportCard
-          metrics={metricsResponse?.metrics ?? null}
-          distribution={distribution}
-          cutoffTime={cutoffTime}
-          rangeLabel={rangeLabel}
-          isLoading={isLoading}
-        />
-
-        {/* Summary Accuracy KPI Cards */}
-        <KPICards
-          metrics={metricsResponse?.metrics ?? null}
-          isLoading={isLoading}
-        />
-
-        {/* Main Forecast vs Actual Chart */}
-        <MainForecastChart
-          comparisonData={comparison}
-          cutoffTime={cutoffTime}
-          deliveryDate={singleDate}
-          isLoading={isLoading}
-        />
-
-        {/* Secondary Analytical Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* Error Distribution Histogram */}
-          <ErrorHistogramChart
-            distribution={distribution}
-            isLoading={isLoading}
-          />
-
-          {/* Diurnal Error by Hour of Day */}
-          <HourlyErrorChart
-            hourlyData={hourlyError}
-            isLoading={isLoading}
-          />
-        </div>
-
-        {/* Lead Time Horizon Analysis */}
-        <HorizonChart
-          horizonData={horizonAnalysis}
-          isLoading={isLoading}
-        />
-
-        {/* Methodology & Assumptions Collapsible Drawer */}
-        <AssumptionsPanel
-          meta={meta}
-          cutoffTime={cutoffTime}
-        />
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-950 py-4 px-6 text-center text-xs text-slate-400">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>
-            GB Wind Forecast Benchmark &copy; 2026 | Elexon BMRS Data Streams: <code className="text-slate-300">WINDFOR</code> &amp; <code className="text-slate-300">FUELHH</code>
-          </span>
-          <span className="text-[11px] text-slate-400">
-            Backend API: <code className="text-slate-300">{apiClient.getBaseUrl()}</code>
-          </span>
-        </div>
-      </footer>
+      {/* Global Interactive Modals */}
+      <AddPanelModal />
+      <ConfirmModal />
+      <ExpandModal renderPanelContent={renderExpandedPanel} />
     </div>
   );
 };
+
+export function App() {
+  return (
+    <ThemeProvider>
+      <DashboardProvider>
+        <DashboardContent />
+      </DashboardProvider>
+    </ThemeProvider>
+  );
+}
 
 export default App;
