@@ -8,9 +8,9 @@ export const ConfirmModal: React.FC = () => {
   if (!isResetConfirmOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div
-        className="w-full max-w-sm bg-white dark:bg-[#131B2E] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden p-6"
+        className="w-full max-w-sm bg-white dark:bg-[#1F1F1F] rounded-2xl border border-slate-200 dark:border-[#2A2A2A] shadow-2xl overflow-hidden p-6"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-reset-title"
@@ -23,7 +23,7 @@ export const ConfirmModal: React.FC = () => {
             <h2 id="confirm-reset-title" className="text-sm font-semibold text-slate-900 dark:text-white">
               Reset Dashboard?
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-[#A3A3A3] mt-0.5">
               This will restore all panels and the default layout.
             </p>
           </div>
@@ -33,7 +33,7 @@ export const ConfirmModal: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsResetConfirmOpen(false)}
-            className="px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            className="px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-[#A3A3A3] hover:bg-slate-100 dark:hover:bg-[#2A2A2A] dark:hover:text-white transition"
           >
             Cancel
           </button>

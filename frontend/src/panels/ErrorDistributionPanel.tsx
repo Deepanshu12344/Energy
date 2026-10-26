@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -15,6 +15,7 @@ import { downloadCsv } from '../utils/csvExport';
 
 interface ErrorDistributionPanelProps {
   onRegisterExport?: (fn: () => void) => void;
+  isPreview?: boolean;
 }
 
 interface CustomTooltipProps {
@@ -35,31 +36,34 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
   const d = payload[0].payload;
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg p-3 text-xs z-50">
-      <div className="font-semibold text-slate-900 dark:text-slate-100 mb-1.5 flex items-center gap-2">
+    <div className="bg-white dark:bg-[#1F1F1F] border border-slate-200 dark:border-[#2A2A2A] rounded-xl shadow-lg p-3 text-xs z-50">
+      <div className="font-semibold text-slate-900 dark:text-white mb-1.5 flex items-center gap-2">
         <span
           className="w-2.5 h-2.5 rounded-sm"
           style={{ backgroundColor: d.isOver ? '#0B8FE3' : '#86C5EE' }}
         />
         <span>{d.label}</span>
       </div>
-      <div className="text-slate-600 dark:text-slate-300">
+      <div className="text-slate-600 dark:text-[#A3A3A3]">
         Count: <strong className="text-slate-900 dark:text-white">{d.count} hours</strong>
       </div>
-      <div className="text-[11px] text-slate-400 mt-1">
+      <div className="text-[11px] text-slate-400 dark:text-[#737373] mt-1">
         {d.isOver ? 'Over-forecast (F > A)' : 'Under-forecast (F < A)'}
       </div>
     </div>
   );
 };
 
-export const ErrorDistributionPanel: React.FC<ErrorDistributionPanelProps> = ({ onRegisterExport }) => {
+const ErrorDistributionPanelComponent: React.FC<ErrorDistributionPanelProps> = ({
+  onRegisterExport,
+  isPreview = false,
+}) => {
   const { distribution, effectiveRange } = useDashboard();
   const { theme } = useTheme();
 
   const isDark = theme === 'dark';
-  const gridColor = isDark ? '#1E293B' : '#F1F5F9';
-  const axisColor = isDark ? '#64748B' : '#94A3B8';
+  const gridColor = isDark ? '#262626' : '#F1F5F9';
+  const axisColor = isDark ? '#808080' : '#94A3B8';
 
   const chartData = React.useMemo(() => {
     if (!distribution?.bins) return [];
@@ -85,7 +89,7 @@ export const ErrorDistributionPanel: React.FC<ErrorDistributionPanelProps> = ({ 
 
   if (!distribution?.bins || distribution.bins.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center text-xs text-slate-400">
+      <div className="flex-1 flex items-center justify-center text-xs text-slate-400 dark:text-[#737373]">
         No distribution data available
       </div>
     );
@@ -93,9 +97,9 @@ export const ErrorDistributionPanel: React.FC<ErrorDistributionPanelProps> = ({ 
 
   return (
     <div className="w-full h-full flex flex-col justify-between">
-      <div className="flex-1 w-full min-h-[220px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 25 }}>
+      <div className="flex-1 w-full min-h-[160px]">
+        <ResponsiveContainer width="100%" height="100%" debounce={100}>
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: isPreview ? 10 : 25 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
             <XAxis
               dataKey="label"
@@ -104,11 +108,11 @@ export const ErrorDistributionPanel: React.FC<ErrorDistributionPanelProps> = ({ 
               angle={-25}
               textAnchor="end"
               tickLine={false}
-              interval={0}
+              interval={isPreview ? 2 : 0}
             />
             <YAxis stroke={axisColor} fontSize={11} tickLine={false} />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+            {!isPreview && <Tooltip content={<CustomTooltip />} />}
+            <Bar dataKey="count" radius={[4, 4, 0, 0]} isAnimationActive={false}>
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
@@ -121,7 +125,7 @@ export const ErrorDistributionPanel: React.FC<ErrorDistributionPanelProps> = ({ 
       </div>
 
       {/* Screenshot-Style Legend */}
-      <div className="flex items-center justify-center gap-6 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400">
+      <div className="flex items-center justify-center gap-6 mt-2 pt-2 border-t border-slate-100 dark:border-[#2A2A2A] text-xs font-medium text-slate-600 dark:text-[#A3A3A3]">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-sm bg-[#0B8FE3]" />
           <span>Over-forecast (F &gt; A)</span>
@@ -134,3 +138,5 @@ export const ErrorDistributionPanel: React.FC<ErrorDistributionPanelProps> = ({ 
     </div>
   );
 };
+
+export const ErrorDistributionPanel = memo(ErrorDistributionPanelComponent);

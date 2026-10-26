@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { apiClient } from '../api/client';
 import type {
   ErrorByHourResponse,
@@ -19,8 +19,10 @@ import {
 export type RangeMode = 'single' | 'full' | 'custom';
 export type ActiveTab = 'dashboard' | 'assumptions';
 
-const STORAGE_LAYOUT_KEY = 'windwatch_dashboard_layout';
-const STORAGE_PANELS_KEY = 'windwatch_visible_panels';
+const STORAGE_LAYOUT_KEY = 'windcast_dashboard_layout';
+const STORAGE_PANELS_KEY = 'windcast_visible_panels';
+const LEGACY_STORAGE_LAYOUT_KEY = 'windwatch_dashboard_layout';
+const LEGACY_STORAGE_PANELS_KEY = 'windwatch_visible_panels';
 
 export interface DashboardContextType {
   // Navigation
@@ -47,9 +49,12 @@ export interface DashboardContextType {
   removePanel: (id: PanelId) => void;
   resetLayout: () => void;
   onLayoutChange: (newLayout: LayoutItem[]) => void;
+  commitLayout: (newLayout: LayoutItem[]) => void;
   lastRemovedPanel: { id: PanelId; title: string } | null;
   undoRemovePanel: () => void;
   clearUndo: () => void;
+  toastMessage: string | null;
+  setToastMessage: (msg: string | null) => void;
 
   // Modals
   expandedPanelId: PanelId | null;
@@ -105,6 +110,16 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [lastRemovedPanel, setLastRemovedPanel] = useState<{ id: PanelId; title: string } | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Auto-dismiss toast notification after 3s
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timer = setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [toastMessage]);
 
   // Compute effective date range
   const effectiveRange = useMemo(() => {
@@ -120,7 +135,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Load layout and visible panels with defensive fallback
   const [visiblePanels, setVisiblePanels] = useState<PanelId[]>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_PANELS_KEY);
+      const raw = localStorage.getItem(STORAGE_PANELS_KEY) || localStorage.getItem(LEGACY_STORAGE_PANELS_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -136,7 +151,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const [layout, setLayout] = useState<LayoutItem[]>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_LAYOUT_KEY);
+      const raw = localStorage.getItem(STORAGE_LAYOUT_KEY) || localStorage.getItem(LEGACY_STORAGE_LAYOUT_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -149,18 +164,28 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return DEFAULT_LAYOUT;
   });
 
-  // Save layout changes to localStorage
-  const onLayoutChange = useCallback((newLayout: LayoutItem[]) => {
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Commit layout changes and debounce write to localStorage
+  const commitLayout = useCallback((newLayout: LayoutItem[]) => {
     setLayout(newLayout);
-    try {
-      localStorage.setItem(STORAGE_LAYOUT_KEY, JSON.stringify(newLayout));
-    } catch {
-      // ignore
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
+    saveTimeoutRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_LAYOUT_KEY, JSON.stringify(newLayout));
+      } catch {
+        // ignore
+      }
+    }, 200);
   }, []);
+
+  const onLayoutChange = commitLayout;
 
   // Panel addition
   const addPanel = useCallback((id: PanelId) => {
+    setToastMessage('Panel added');
     setVisiblePanels((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
@@ -441,9 +466,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         removePanel,
         resetLayout,
         onLayoutChange,
+        commitLayout,
         lastRemovedPanel,
         undoRemovePanel,
         clearUndo,
+        toastMessage,
+        setToastMessage,
         expandedPanelId,
         setExpandedPanelId,
         isAddModalOpen,

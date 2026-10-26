@@ -47,7 +47,7 @@ const DashboardContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] dark:bg-[#0B0F19] transition-colors flex flex-col font-sans selection:bg-[#0B8FE3]/20">
+    <div className="min-h-screen bg-[#F5F7FA] dark:bg-[#0A0A0A] transition-colors flex flex-col font-sans selection:bg-[#0B8FE3]/20">
       {/* Top Navigation Bar */}
       <Navbar />
 
@@ -78,7 +78,7 @@ const DashboardContent: React.FC = () => {
                   onClick={() => setIsResetConfirmOpen(true)}
                   title="Reset dashboard layout to default"
                   aria-label="Reset layout"
-                  className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50/50 dark:hover:bg-rose-950/30 transition"
+                  className="p-2 rounded-lg border border-slate-200 dark:border-[#2A2A2A] text-slate-400 dark:text-[#A3A3A3] hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50/50 dark:hover:bg-rose-950/30 transition"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

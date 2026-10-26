@@ -10,12 +10,13 @@ export interface ThemeContextType {
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const THEME_STORAGE_KEY = 'windwatch_theme';
+const THEME_STORAGE_KEY = 'windcast_theme';
+const LEGACY_THEME_KEY = 'windwatch_theme';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
     try {
-      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      const saved = localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem(LEGACY_THEME_KEY);
       if (saved === 'dark' || saved === 'light') return saved;
     } catch {
       // fallback
