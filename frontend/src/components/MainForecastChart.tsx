@@ -261,7 +261,9 @@ export const MainForecastChart: React.FC<MainForecastChartProps> = ({
               strokeWidth={2.5}
               dot={false}
               activeDot={{ r: 5, fill: '#0B8FE3', stroke: '#086cb0', strokeWidth: 2 }}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
             />
 
             {/* Forecasts Series: Dashed line with markers connecting ONLY the 24 hourly points (no :30 nulls) */}
@@ -274,7 +276,9 @@ export const MainForecastChart: React.FC<MainForecastChartProps> = ({
               strokeDasharray="5 5"
               dot={{ r: 3.5, fill: '#86C5EE', stroke: '#5faedb', strokeWidth: 1 }}
               activeDot={{ r: 6, fill: '#86C5EE', stroke: '#ffffff', strokeWidth: 2 }}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
             />
           </LineChart>
         </ResponsiveContainer>

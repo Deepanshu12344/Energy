@@ -185,7 +185,9 @@ const ForecastChartPanelComponent: React.FC<ForecastChartPanelProps> = ({ isPrev
               dot={{ r: 2.5, fill: '#0B8FE3' }}
               activeDot={isPreview ? false : { r: 5, fill: '#0B8FE3' }}
               connectNulls={false}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
             />
             {/* Hourly forecasts: Dashed line with markers, hourly-only points without interpolation */}
             <Line
@@ -198,7 +200,9 @@ const ForecastChartPanelComponent: React.FC<ForecastChartPanelProps> = ({ isPrev
               dot={{ r: 3.5, fill: '#86C5EE', stroke: '#0B8FE3', strokeWidth: 1 }}
               activeDot={isPreview ? false : { r: 6, fill: '#86C5EE' }}
               connectNulls={true}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
             />
           </LineChart>
         </ResponsiveContainer>

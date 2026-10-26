@@ -143,7 +143,13 @@ const ErrorDistributionPanelComponent: React.FC<ErrorDistributionPanelProps> = (
               width={50}
             />
             {!isPreview && <Tooltip content={<CustomTooltip />} />}
-            <Bar dataKey="count" radius={[4, 4, 0, 0]} isAnimationActive={false}>
+            <Bar
+              dataKey="count"
+              radius={[4, 4, 0, 0]}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
+            >
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}

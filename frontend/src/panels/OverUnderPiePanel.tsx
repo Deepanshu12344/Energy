@@ -120,7 +120,9 @@ const OverUnderPiePanelComponent: React.FC<OverUnderPiePanelProps> = ({ isPrevie
               dataKey="value"
               stroke={isDark ? '#141414' : '#FFFFFF'}
               strokeWidth={2}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
             >
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />

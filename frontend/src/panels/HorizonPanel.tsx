@@ -143,7 +143,15 @@ const HorizonPanelComponent: React.FC<HorizonPanelProps> = ({ onRegisterExport, 
               width={55}
             />
             {!isPreview && <Tooltip content={<CustomTooltip />} />}
-            <Bar dataKey="mae" name="MAE (MW)" fill="#0B8FE3" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+            <Bar
+              dataKey="mae"
+              name="MAE (MW)"
+              fill="#0B8FE3"
+              radius={[4, 4, 0, 0]}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

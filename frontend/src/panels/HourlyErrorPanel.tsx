@@ -163,7 +163,9 @@ const HourlyErrorPanelComponent: React.FC<HourlyErrorPanelProps> = ({
               name="MAE (MW)"
               fill="#86C5EE"
               radius={[3, 3, 0, 0]}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
             />
             {/* Bias Line */}
             <Line
@@ -174,7 +176,9 @@ const HourlyErrorPanelComponent: React.FC<HourlyErrorPanelProps> = ({
               strokeWidth={2}
               dot={{ r: 2.5, fill: '#0B8FE3' }}
               activeDot={isPreview ? false : { r: 5, fill: '#0B8FE3' }}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
             />
           </ComposedChart>
         </ResponsiveContainer>
