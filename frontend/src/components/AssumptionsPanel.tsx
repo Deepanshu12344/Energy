@@ -65,7 +65,7 @@ export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({ meta, cutoff
                 <span>Zero-Division MAPE Guard</span>
               </div>
               <p className="text-slate-400 leading-relaxed">
-                Actual generation outturn below <strong className="text-slate-200">10 MW</strong> is excluded from MAPE calculation to prevent explosive division by near-zero during wind lull periods. All valid slots remain included in MAE, RMSE, and percentiles.
+                Actual generation outturn below <strong className="text-slate-200">10 MW</strong> is excluded from MAPE calculation to prevent explosive division by near-zero during low-actual generation periods. All valid slots remain included in MAE, RMSE, and percentiles.
               </p>
             </div>
 

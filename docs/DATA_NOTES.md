@@ -128,12 +128,11 @@ Evaluating Pearson correlation between actual generation at $t$ and selected for
 - **Mean Error (Bias):** **+1,685.27 MW** (evaluating `forecast - actual` across all 744 hourly delivery slots).
 - **Directional Tendency:** Wind generation forecasts exhibited a systemic positive bias (over-forecasting) throughout the January purchase decision window.
 - **Hourly Over-Forecasting Share:** Wind generation forecasts exceeded actuals in **84.95% of evaluated hours** (632 out of 744 hourly slots).
-- **Daily Over-Forecasting Rate:** The mean daily forecast exceeded actual generation on **29 out of 31 days (93.5% of delivery days)**.
 
 ### 5.3 Volumetric Accuracy Metrics
 - **Mean Absolute Error (MAE):** **1,883.98 MW**.
 - **Root Mean Squared Error (RMSE):** **2,350.33 MW**.
-- **Guarded MAPE:** **18.86%** (with 0 hours excluded due to $<10\text{ MW}$ lull threshold).
+- **Guarded MAPE:** **18.86%** (with 0 hours excluded due to $<10\text{ MW}$ low-actual threshold).
 
 ### 5.4 Error Percentiles & Operating Reserve Buffer
 - **P50 Absolute Error:** **1,606.50 MW**.
@@ -143,8 +142,8 @@ Evaluating Pearson correlation between actual generation at $t$ and selected for
 
 ### 5.5 Market Auction Context
 - Commercial physical day-ahead auctions in Great Britain close at:
-  - **EPEX SPOT GB Day-Ahead (60-minute auction):** **09:20 Europe/London** (D-1).
-  - **Nord Pool (N2EX) GB Day-Ahead:** **09:50 Europe/London** (D-1).
+  - **[EPEX SPOT GB Day-Ahead (60-minute auction)](https://www.epexspot.com/en/market-data?market_area=GB&trading_hub=GB&delivery_date=&underlying_market=Auction&modality=Day-Ahead&sub_modality=60min):** Order book closes daily at **09:20 Europe/London** (D-1).
+  - **[Nord Pool (N2EX) GB Day-Ahead](https://www.nordpoolgroup.com/en/trading/Day-ahead-trading/Auction-Trading/):** Order book closes daily at **09:50 Europe/London** (D-1).
 - Elexon BSC physical notifications (FPNs) and balancing bids close 1 hour ahead of each half-hour settlement period on day D.
-- The 12:00 London cutoff corresponds to the continental European SDAC auction clearing time and serves as a standardized market analytical benchmark.
+- The application defaults to a **12:00 Europe/London** D-1 cutoff time while allowing energy buyers to configure earlier cutoffs (such as 09:20 or 09:50) to evaluate forecast availability at exchange auction closures.
 

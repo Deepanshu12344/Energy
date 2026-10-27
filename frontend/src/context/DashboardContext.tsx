@@ -340,7 +340,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [effectiveRange.start, effectiveRange.end, cutoffTime]);
 
-  // Fetch distribution & pie data
+  // Fetch distribution & split-bar data
   const fetchDistribution = useCallback(async () => {
     try {
       setLoadingDistribution(true);

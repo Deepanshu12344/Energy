@@ -123,7 +123,7 @@ export const AssumptionsView: React.FC = () => {
           </div>
           <ul className="text-xs text-slate-600 dark:text-[#A3A3A3] space-y-2 leading-relaxed">
             <li>
-              <strong>Default Cutoff:</strong> Set to <strong>12:00 Europe/London</strong> on Day D-1 (industry benchmark; commercial GB day-ahead auctions close at 09:20 EPEX / 09:50 N2EX).
+              <strong>Default Cutoff:</strong> Set to <strong>12:00 Europe/London</strong> on Day D-1. Commercial GB day-ahead auction order books close earlier: <a href="https://www.epexspot.com/en/market-data?market_area=GB&trading_hub=GB&delivery_date=&underlying_market=Auction&modality=Day-Ahead&sub_modality=60min" target="_blank" rel="noopener noreferrer" className="text-[#0B8FE3] underline hover:text-[#0B8FE3]/80">09:20 EPEX SPOT</a> and <a href="https://www.nordpoolgroup.com/en/trading/Day-ahead-trading/Auction-Trading/" target="_blank" rel="noopener noreferrer" className="text-[#0B8FE3] underline hover:text-[#0B8FE3]/80">09:50 Nord Pool (N2EX)</a>.
             </li>
             <li>
               <strong>Selection Criteria:</strong> For each settlement slot, selects the single forecast with greatest <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#1F1F1F] font-mono text-[11px]">publish_time &le; cutoff</code>.

@@ -108,6 +108,6 @@ CREATE INDEX idx_wind_forecasts_cutoff ON wind_forecasts (start_time, publish_ti
 When walking through the architecture in the technical presentation:
 1. **The Energy Trading Problem:** Highlight why a day-ahead wind buyer cannot simply look at a single forecast—National Grid revises forecasts continuously. A buyer must freeze their view at **12:00 London on Day D-1** (gate closure) and quantify the volumetric risk.
 2. **The 3-Tier Pipeline:** Show the Mermaid diagram demonstrating how ingestion pre-populates Supabase, how FastAPI serves pure statistical metrics, and how the React SPA renders interactive curves without business logic.
-3. **The +1,685 MW Bias Story:** Point out that forecasts systematically over-predicted wind generation on **29 of 31 days (93.5%)** and in **85.0% of hours** (+1,685.27 MW mean bias). Explain why this means unhedged buyers face cash-out imbalance penalties.
+3. **The +1,685 MW Bias Story:** Point out that forecasts systematically over-predicted wind generation in **85.0% of hours** (+1,685.27 MW mean bias across the evaluation window). Explain why this means unhedged buyers face cash-out imbalance penalties.
 4. **The P90 Buffer Metric:** Explain that 90% of hourly errors fell within **3,768 MW**, giving procurement managers an objective operational buffer.
 5. **Production Hardening:** Highlight the `min_size=0` connection pooling for serverless cold-start resilience, multi-stage Docker builds, code-split frontend bundles, and 94% automated test coverage.

@@ -37,11 +37,10 @@ Independent validation across all 744 hourly delivery intervals for January 2026
 | Metric | Validated Value | Interpretation & Source |
 |---|---|---|
 | **Mean Error (Bias)** | **+1,685.27 MW** | Systemic over-forecasting. Forecasts overshot actual wind outturn by an average of 1.69 GW across the evaluation window. *(From `GET /api/metrics`)*. |
-| **Daily Over-Forecasting Rate** | **29 of 31 days (93.5%)** | The average daily forecast was **higher than actual on 29 of 31 delivery days (93.5%)**. Only 2 days under-forecast. *(From raw database daily outturn averages)*. |
 | **Hourly Over-Forecasting Share** | **85.0% of hours** | Wind forecasts were **higher than actual in 85.0% of hours** (632 out of 744 evaluated hourly slots). *(From `GET /api/error-distribution`)*. |
 | **Mean Absolute Error (MAE)** | **1,883.98 MW** | The average absolute volumetric deviation between forecast and actual outturn. *(From `GET /api/metrics`)*. |
 | **Root Mean Squared Error (RMSE)**| **2,350.33 MW** | Penalizes severe forecast swings and sudden ramp misses. *(From `GET /api/metrics`)*. |
-| **Guarded MAPE** | **18.86%** | Evaluated on valid slots; zero slots were distorted by near-zero wind lull generation ($<10\text{ MW}$). *(From `GET /api/metrics`)*. |
+| **Guarded MAPE** | **18.86%** | Evaluated on valid slots; zero slots were distorted by near-zero wind low-actual generation ($<10\text{ MW}$). *(From `GET /api/metrics`)*. |
 | **P90 Absolute Error (Buffer)** | **3,767.70 MW** | In 9 of 10 hours the forecast was within 3,768 MW of actual, so a buffer of 3,768 MW would have covered most hours. *(From `GET /api/metrics` via linear percentile)*. |
 | **P95 Absolute Error** | **4,497.75 MW** | Extreme tail deviation representing severe gale ramp misses. *(From `GET /api/metrics`)*. |
 
@@ -327,9 +326,9 @@ The project is structured for clean two-project deployment on Vercel:
 
 ## 9. Assumptions & Limitations
 
-1. **Gate Closure / Decision Cutoff:** Set to **12:00 Europe/London** on Day D-1 (the GB Day-Ahead auction clearing gate). Any forecasts published after this cutoff are excluded from day-ahead metrics.
+1. **Gate Closure / Decision Cutoff:** Defaults to **12:00 Europe/London** on Day D-1 (configurable by energy buyers to match earlier exchange auction gate closures such as 09:20 EPEX SPOT or 09:50 Nord Pool). Any forecasts published after this cutoff are excluded from day-ahead metrics.
 2. **Resolution Alignment:** WINDFOR forecasts are hourly (`:00`); FUELHH actuals are half-hourly (`:00` and `:30`). Evaluations are conducted strictly at matching `:00` timestamps without artificial forward-filling or interpolation.
-3. **Zero-Division MAPE Guard:** Generation outturns below **10.0 MW** are excluded from the MAPE denominator to prevent division-by-zero spikes during wind lull periods. All slots remain included in MAE, RMSE, and percentiles.
+3. **Zero-Division MAPE Guard:** Generation outturns below **10.0 MW** are excluded from the MAPE denominator to prevent division-by-zero spikes during low-actual generation periods. All slots remain included in MAE, RMSE, and percentiles.
 4. **Percentile Methodology:** $P_{50}, P_{90}, P_{95}$ absolute errors are computed using standard linear interpolation (`method="linear"`), consistent with NumPy and SciPy standards.
 5. **Timezone Standardization:** All raw data is stored in **UTC** in PostgreSQL. Inputs and day boundaries are interpreted according to the Great Britain business timezone (`Europe/London`).
 
