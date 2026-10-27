@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, memo } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 import { downloadCsv } from '../utils/csvExport';
-import { formatPublishedUtc } from '../utils/dateFormatting';
+import { formatPublishedUtc, formatSlotTime } from '../utils/dateFormatting';
 
 interface DataTablePanelProps {
   isSearchOpen?: boolean;
@@ -19,11 +19,12 @@ const DataTablePanelComponent: React.FC<DataTablePanelProps> = ({
   onRegisterExport,
   isPreview = false,
 }) => {
-  const { forecast, singleDate } = useDashboard();
+  const { forecast, singleDate, rangeMode } = useDashboard();
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
 
   const items = useMemo(() => forecast?.data || [], [forecast?.data]);
+  const isMultiDay = rangeMode !== 'single';
 
   // Reset page when date changes
   useEffect(() => {
@@ -35,7 +36,7 @@ const DataTablePanelComponent: React.FC<DataTablePanelProps> = ({
     if (!searchQuery.trim()) return items;
     const q = searchQuery.toLowerCase().trim();
     return items.filter((item) => {
-      const time = item.start_time.slice(11, 16).toLowerCase();
+      const time = formatSlotTime(item.start_time, isMultiDay).toLowerCase();
       const status = item.status.toLowerCase();
       const actual = item.actual_mw !== null ? String(item.actual_mw) : '';
       const forecastVal = item.forecast_mw !== null ? String(item.forecast_mw) : '';
@@ -46,7 +47,7 @@ const DataTablePanelComponent: React.FC<DataTablePanelProps> = ({
         forecastVal.includes(q)
       );
     });
-  }, [items, searchQuery]);
+  }, [items, searchQuery, isMultiDay]);
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -143,11 +144,11 @@ const DataTablePanelComponent: React.FC<DataTablePanelProps> = ({
               </tr>
             ) : (
               pageItems.map((row, idx) => {
-                const time = row.start_time.slice(11, 16);
+                const time = formatSlotTime(row.start_time, isMultiDay);
                 const published = formatPublishedUtc(row.publish_time);
                 const isOver = row.error_mw !== null && row.error_mw > 0;
                 const isUnder = row.error_mw !== null && row.error_mw < 0;
-                const rowBg = idx % 2 === 0 ? 'bg-white dark:bg-[#141414]' : 'bg-slate-50/50 dark:bg-[#1A1A1A]';
+                const rowBg = idx % 2 === 0 ? 'bg-white dark:bg-[#141414]' : 'bg-slate-50 dark:bg-[#1A1A1A]';
 
                 return (
                   <tr
@@ -188,7 +189,7 @@ const DataTablePanelComponent: React.FC<DataTablePanelProps> = ({
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium ${
                           row.status === 'forecast_selected'
-                            ? 'bg-blue-50 dark:bg-blue-950/60 text-[#0B8FE3] dark:text-[#86C5EE]'
+                            ? 'bg-blue-50 dark:bg-[#1F1F1F] text-[#0B8FE3] dark:text-[#86C5EE] border border-transparent dark:border-[#2A2A2A]'
                             : row.status === 'missing'
                             ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
                             : 'bg-slate-100 dark:bg-[#2A2A2A] text-slate-500 dark:text-[#A3A3A3]'

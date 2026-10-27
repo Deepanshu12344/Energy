@@ -114,7 +114,7 @@ export const AddPanelModal: React.FC = () => {
         <div className="flex-1 min-h-0 overflow-y-auto p-6 bg-slate-50/60 dark:bg-[#0A0A0A]">
           {availablePanels.length === 0 ? (
             <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center p-8">
-              <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-950/40 text-[#0B8FE3] flex items-center justify-center mb-3">
+              <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-[#1F1F1F] text-[#0B8FE3] flex items-center justify-center mb-3 dark:border dark:border-[#2A2A2A]">
                 <CheckCircle2 className="w-8 h-8 text-[#0B8FE3]" />
               </div>
               <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
@@ -149,7 +149,7 @@ export const AddPanelModal: React.FC = () => {
                       <h4 className="text-sm font-semibold text-slate-800 dark:text-white tracking-tight">
                         {def.title}
                       </h4>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-[#0B8FE3] group-hover:bg-[#0B8FE3] group-hover:text-white transition">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 dark:bg-[#1F1F1F] text-[#0B8FE3] dark:border dark:border-[#2A2A2A] group-hover:bg-[#0B8FE3] group-hover:text-white transition">
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add</span>
                       </span>

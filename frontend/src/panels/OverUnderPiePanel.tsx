@@ -1,39 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { useDashboard } from '../context/DashboardContext';
-import { useTheme } from '../context/ThemeContext';
-
-interface CustomPieTooltipProps {
-  active?: boolean;
-  payload?: Array<{
-    payload: {
-      name: string;
-      value: number;
-      count: number;
-      color: string;
-    };
-  }>;
-}
-
-const CustomPieTooltip: React.FC<CustomPieTooltipProps> = ({ active, payload }) => {
-  if (!active || !payload || !payload.length) return null;
-  const d = payload[0].payload;
-
-  return (
-    <div className="bg-white dark:bg-[#1F1F1F] border border-slate-200 dark:border-[#2A2A2A] rounded-xl shadow-lg p-3 text-xs z-50">
-      <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
-        <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: d.color }} />
-        <span>{d.name}</span>
-      </div>
-      <div className="text-slate-600 dark:text-[#A3A3A3]">
-        Share: <strong className="text-slate-900 dark:text-white">{d.value.toFixed(1)}%</strong>
-      </div>
-      <div className="text-[11px] text-slate-400 dark:text-[#737373] mt-0.5">
-        Count: {d.count.toLocaleString()} hours
-      </div>
-    </div>
-  );
-};
 
 interface OverUnderPiePanelProps {
   isPreview?: boolean;
@@ -41,108 +7,128 @@ interface OverUnderPiePanelProps {
 
 const OverUnderPiePanelComponent: React.FC<OverUnderPiePanelProps> = ({ isPreview = false }) => {
   const { distribution } = useDashboard();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
 
-  const chartData = useMemo(() => {
-    if (!distribution) return [];
+  const stats = useMemo(() => {
+    if (!distribution) return null;
     const overShare = distribution.over_forecast_share ?? 0;
     const total = distribution.total_samples ?? 0;
     const overCount = distribution.over_forecast_count ?? Math.round(total * overShare);
     const underCount = Math.max(0, total - overCount);
-    const underShare = total > 0 ? underCount / total : 0;
+    const overPct = Number((overShare * 100).toFixed(1));
+    const underPct = total > 0 ? Number(((underCount / total) * 100).toFixed(1)) : 0;
 
-    return [
-      {
-        name: 'Over-forecast (F > A)',
-        value: Number((overShare * 100).toFixed(1)),
-        count: overCount,
-        color: '#0B8FE3',
-      },
-      {
-        name: 'Under-forecast (F ≤ A)',
-        value: Number((underShare * 100).toFixed(1)),
-        count: underCount,
-        color: '#86C5EE',
-      },
-    ];
+    return {
+      total,
+      overCount,
+      underCount,
+      overPct,
+      underPct,
+    };
   }, [distribution]);
 
-  if (!distribution || chartData.length === 0) {
+  if (!distribution || !stats) {
     return (
       <div className="flex-1 flex items-center justify-center text-xs text-slate-400 dark:text-[#737373]">
-        No pie chart data available
+        No distribution data available
       </div>
     );
   }
 
-  const renderInsideLabel = (props: {
-    cx?: number;
-    cy?: number;
-    midAngle?: number;
-    innerRadius?: number;
-    outerRadius?: number;
-    value?: number;
-  }) => {
-    const { cx = 0, cy = 0, midAngle = 0, innerRadius = 0, outerRadius = 0, value = 0 } = props;
-    if (value < 5) return null;
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  const { total, overCount, underCount, overPct, underPct } = stats;
 
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="#FFFFFF"
-        textAnchor="middle"
-        dominantBaseline="central"
-        className="font-bold text-xs select-none pointer-events-none drop-shadow-sm"
-      >
-        {`${value}%`}
-      </text>
-    );
-  };
+  const isOverSmall = overPct > 0 && overPct < 8;
+  const isUnderSmall = underPct > 0 && underPct < 8;
 
   return (
-    <div className="w-full h-full flex flex-col justify-between">
-      <div className="flex-1 w-full min-h-[160px]">
-        <ResponsiveContainer width="100%" height="100%" debounce={100}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={renderInsideLabel}
-              outerRadius={isPreview ? 58 : 78}
-              dataKey="value"
-              stroke={isDark ? '#141414' : '#FFFFFF'}
-              strokeWidth={2}
-              isAnimationActive={true}
-              animationDuration={800}
-              animationEasing="ease-out"
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            {!isPreview && <Tooltip content={<CustomPieTooltip />} />}
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Legend underneath */}
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-[#2A2A2A] text-xs font-medium text-slate-600 dark:text-[#A3A3A3]">
-        {chartData.map((item) => (
-          <div key={item.name} className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: item.color }} />
-            <span>
-              {item.name}: <strong className="text-slate-900 dark:text-white">{item.value}%</strong> ({item.count.toLocaleString()}h)
+    <div className="w-full h-full flex flex-col justify-between p-1">
+      {/* Top: Large Headline */}
+      <div>
+        <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+          <div className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {overPct}%{' '}
+            <span className="text-sm font-semibold text-slate-600 dark:text-[#A3A3A3]">
+              of hours over-forecast
             </span>
           </div>
-        ))}
+        </div>
+        {!isPreview && (
+          <p className="text-xs text-slate-500 dark:text-[#737373]">
+            Outturn generation was below the day-ahead selected forecast in {overCount.toLocaleString()} of {total.toLocaleString()} hours.
+          </p>
+        )}
+      </div>
+
+      {/* Middle: Horizontal Split Bar */}
+      <div className="my-auto py-2">
+        <div className="relative w-full h-10 sm:h-12 bg-slate-100 dark:bg-[#1A1A1A] rounded-xl overflow-hidden flex border border-slate-200/80 dark:border-[#2A2A2A] shadow-inner">
+          {/* Over-forecast segment */}
+          {overPct > 0 && (
+            <div
+              style={{ width: `${overPct}%` }}
+              className="h-full bg-[#0B8FE3] hover:brightness-105 transition-all flex items-center justify-center px-2 text-white overflow-hidden group relative"
+              title={`Over-forecast: ${overPct}% (${overCount} hrs)`}
+            >
+              {!isOverSmall ? (
+                <div className="flex items-center gap-1.5 text-xs font-bold whitespace-nowrap drop-shadow-sm">
+                  <span>{overPct}%</span>
+                  <span className="text-[10px] font-medium opacity-90 hidden sm:inline">
+                    ({overCount.toLocaleString()}h)
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          {/* Under-forecast segment */}
+          {underPct > 0 && (
+            <div
+              style={{ width: `${underPct}%` }}
+              className="h-full bg-[#86C5EE] hover:brightness-105 transition-all flex items-center justify-center px-2 text-slate-900 overflow-hidden group relative"
+              title={`Under-forecast: ${underPct}% (${underCount} hrs)`}
+            >
+              {!isUnderSmall ? (
+                <div className="flex items-center gap-1.5 text-xs font-bold whitespace-nowrap drop-shadow-sm">
+                  <span>{underPct}%</span>
+                  <span className="text-[10px] font-medium opacity-90 hidden sm:inline">
+                    ({underCount.toLocaleString()}h)
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          )}
+        </div>
+
+        {/* Small segment & 0% outside labels */}
+        {(isOverSmall || isUnderSmall || overPct === 0 || underPct === 0) && (
+          <div className="flex justify-between text-[11px] text-slate-500 dark:text-[#A3A3A3] mt-1.5 px-1 font-medium">
+            {(isOverSmall || overPct === 0) && (
+              <span className="text-[#0B8FE3] font-semibold">
+                Over: {overPct}% ({overCount}h)
+              </span>
+            )}
+            {(isUnderSmall || underPct === 0) && (
+              <span className="text-[#0B8FE3] dark:text-[#86C5EE] font-semibold ml-auto">
+                Under: {underPct}% ({underCount}h)
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Bottom: Clean Legend with Swatches, Counts, and Percentages */}
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-[#2A2A2A] text-xs font-medium text-slate-600 dark:text-[#A3A3A3]">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm bg-[#0B8FE3] shrink-0" />
+          <span>
+            Over-forecast: <strong className="text-slate-900 dark:text-white">{overPct}%</strong> ({overCount.toLocaleString()}h)
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm bg-[#86C5EE] shrink-0" />
+          <span>
+            Under-forecast: <strong className="text-slate-900 dark:text-white">{underPct}%</strong> ({underCount.toLocaleString()}h)
+          </span>
+        </div>
       </div>
     </div>
   );

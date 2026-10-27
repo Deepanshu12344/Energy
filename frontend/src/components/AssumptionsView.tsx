@@ -1,12 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Database, Clock, Scale, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
+import { apiClient } from '../api/client';
+import type { MetricsResponse, ErrorDistributionResponse } from '../api/types';
 
 export const AssumptionsView: React.FC = () => {
-  const { meta, metrics, distribution } = useDashboard();
+  const { meta } = useDashboard();
 
-  const m = metrics?.metrics;
-  const dist = distribution;
+  // BUG 1: Key Finding card must always summarise the full range (2026-01-02 to 2026-02-01)
+  // at the default cutoff from /api/meta, completely isolated from dashboard filter state.
+  const [keyFindingMetrics, setKeyFindingMetrics] = useState<MetricsResponse | null>(null);
+  const [keyFindingDist, setKeyFindingDist] = useState<ErrorDistributionResponse | null>(null);
+
+  const defaultCutoff = meta?.default_cutoff_time ?? '12:00';
+
+  useEffect(() => {
+    let active = true;
+    const fetchKeyFindingData = async () => {
+      try {
+        const [mRes, dRes] = await Promise.all([
+          apiClient.getMetrics('2026-01-02', '2026-02-01', defaultCutoff),
+          apiClient.getErrorDistribution('2026-01-02', '2026-02-01', defaultCutoff, 10),
+        ]);
+        if (active) {
+          setKeyFindingMetrics(mRes);
+          setKeyFindingDist(dRes);
+        }
+      } catch (err) {
+        console.error('Failed to load key finding benchmark data:', err);
+      }
+    };
+
+    void fetchKeyFindingData();
+    return () => {
+      active = false;
+    };
+  }, [defaultCutoff]);
+
+  const m = keyFindingMetrics?.metrics;
+  const dist = keyFindingDist;
 
   const overSharePct =
     dist?.over_forecast_share !== undefined && dist?.over_forecast_share !== null
@@ -42,11 +74,11 @@ export const AssumptionsView: React.FC = () => {
             Key Analytical Finding (January 2026)
           </span>
           <p className="text-sm font-medium text-slate-800 dark:text-white leading-relaxed">
-            At the 12:00 D-1 cutoff, Elexon WINDFOR forecasts were systematically higher than actual generation across{' '}
+            Across all January decisions (delivery 2 Jan to 1 Feb) at the {defaultCutoff} Europe/London cutoff, Elexon WINDFOR forecasts were systematically higher than actual generation across{' '}
             <strong className="text-slate-900 dark:text-white">
               {overSharePct ? `${overSharePct} of evaluated hours` : 'evaluating...'}
-            </strong>{' '}
-            and on <strong className="text-slate-900 dark:text-white">29 of 31 delivery days (93.5%)</strong>, with an average mean bias of{' '}
+            </strong>
+            , with an average mean bias of{' '}
             <strong className="text-[#0B8FE3] font-semibold">
               {biasFormatted ?? 'calculating...'}
             </strong>{' '}
@@ -181,8 +213,8 @@ export const AssumptionsView: React.FC = () => {
           <p className="text-xs text-slate-600 dark:text-[#A3A3A3] leading-relaxed">
             Forecasts published after the target time are excluded from the forward-looking lead-time buckets.
           </p>
-          <div className="p-2.5 rounded-lg bg-blue-50/80 dark:bg-blue-950/30 text-[11px] text-blue-800 dark:text-blue-300 border border-blue-100 dark:border-blue-900/30">
-            Guarantees day-ahead forward purchase decisions are evaluated exclusively against genuine pre-delivery forecasts.
+          <div className="p-2.5 rounded-lg bg-blue-50/80 dark:bg-[#1F1F1F] text-[11px] text-slate-700 dark:text-[#A3A3A3] border border-blue-100 dark:border-[#2A2A2A]">
+            Forecasts published after the target time are excluded from the forward-looking lead-time buckets and shown separately.
           </div>
         </div>
       </div>

@@ -30,8 +30,8 @@ export const Controls: React.FC<ControlsProps> = ({
   onCutoffTimeChange,
   isLoading,
 }) => {
-  const minDate = '2026-01-01';
-  const maxDate = '2026-01-31';
+  const minDate = '2026-01-02';
+  const maxDate = '2026-02-01';
 
   const handlePrevDay = () => {
     if (rangeMode === 'single') {
@@ -167,7 +167,7 @@ export const Controls: React.FC<ControlsProps> = ({
           {rangeMode === 'full' && (
             <div className="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 text-xs text-slate-300">
               <Calendar className="w-4 h-4 text-[#0B8FE3]" />
-              <span>Evaluating all 31 delivery days: <strong>2026-01-01 to 2026-01-31</strong> (744 hours)</span>
+              <span>Evaluating all 31 delivery days: <strong>2026-01-02 to 2026-02-01</strong> (744 hours)</span>
             </div>
           )}
 

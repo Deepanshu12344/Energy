@@ -75,25 +75,25 @@ def run_smoke_test():
     for item in fc_data["data"][:6]:
         print(f"  Slot {item['start_time']} | Actual: {item['actual_mw']} MW | Forecast: {item['forecast_mw']} MW | Pub: {item['publish_time']} | Lead: {item['lead_time_hours']}h | Error: {item['error_mw']} MW | Status: {item['status']}")
 
-    # 4. GET /api/metrics?start=2026-01-01&end=2026-01-31&cutoff=12:00
-    print("\n--- 4. GET /api/metrics (Full January 2026, Cutoff 12:00) ---")
-    resp = client.get("/api/metrics?start=2026-01-01&end=2026-01-31&cutoff=12:00")
+    # 4. GET /api/metrics?start=2026-01-02&end=2026-02-01&cutoff=12:00
+    print("\n--- 4. GET /api/metrics (Full January Decisions: 2026-01-02 to 2026-02-01, Cutoff 12:00) ---")
+    resp = client.get("/api/metrics?start=2026-01-02&end=2026-02-01&cutoff=12:00")
     assert resp.status_code == 200
     metrics_data = resp.json()
     print(json.dumps(metrics_data, indent=2))
 
-    # 5. GET /api/error-by-hour?start=2026-01-01&end=2026-01-31&cutoff=12:00
+    # 5. GET /api/error-by-hour?start=2026-01-02&end=2026-02-01&cutoff=12:00
     print("\n--- 5. GET /api/error-by-hour (Sample Hours 0, 6, 12, 18, 23) ---")
-    resp = client.get("/api/error-by-hour?start=2026-01-01&end=2026-01-31&cutoff=12:00")
+    resp = client.get("/api/error-by-hour?start=2026-01-02&end=2026-02-01&cutoff=12:00")
     assert resp.status_code == 200
     ebh_data = resp.json()
     sample_hours = [h for h in ebh_data["hourly_errors"] if h["hour"] in (0, 6, 12, 18, 23)]
     for h in sample_hours:
         print(f"  Hour {h['hour']:02d}:00 | Observations: {h['count']} | MAE: {h['mae']} MW | RMSE: {h['rmse']} MW | Bias: {h['bias']} MW")
 
-    # 6. GET /api/horizon-analysis?start=2026-01-01&end=2026-01-31
-    print("\n--- 6. GET /api/horizon-analysis (Full January 2026) ---")
-    resp = client.get("/api/horizon-analysis?start=2026-01-01&end=2026-01-31")
+    # 6. GET /api/horizon-analysis?start=2026-01-02&end=2026-02-01
+    print("\n--- 6. GET /api/horizon-analysis (Full January Decisions: 2026-01-02 to 2026-02-01) ---")
+    resp = client.get("/api/horizon-analysis?start=2026-01-02&end=2026-02-01")
     assert resp.status_code == 200
     horizon_data = resp.json()
     print("Forward-looking Buckets:")

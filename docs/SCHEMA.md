@@ -163,19 +163,19 @@ Returns summary evaluation metrics over a delivery date range evaluated on hourl
 
 ```json
 {
-  "start_date": "2026-01-01",
-  "end_date": "2026-01-31",
+  "start_date": "2026-01-02",
+  "end_date": "2026-02-01",
   "cutoff_time": "12:00",
   "metrics": {
-    "mae": 2002.91,
-    "rmse": 2470.08,
-    "bias": 1805.86,
-    "mape": 19.5,
+    "mae": 1883.98,
+    "rmse": 2350.33,
+    "bias": 1685.27,
+    "mape": 18.86,
     "mape_excluded_count": 0,
-    "p50_abs_error": 1709.5,
-    "p90_abs_error": 4000.0,
-    "p95_abs_error": 4686.1,
-    "buffer_recommendation_mw_p90": 4000.0,
+    "p50_abs_error": 1606.5,
+    "p90_abs_error": 3767.7,
+    "p95_abs_error": 4497.75,
+    "buffer_recommendation_mw_p90": 3767.7,
     "total_slots": 744,
     "evaluated_slots": 744,
     "missing_slots": 0
@@ -188,23 +188,23 @@ Returns accuracy metrics aggregated across the 24 hours of the delivery day (0 t
 
 ```json
 {
-  "start_date": "2026-01-01",
-  "end_date": "2026-01-31",
+  "start_date": "2026-01-02",
+  "end_date": "2026-02-01",
   "cutoff_time": "12:00",
   "hourly_errors": [
     {
       "hour": 0,
       "count": 31,
-      "mae": 2078.0,
-      "rmse": 2660.04,
-      "bias": 2016.06
+      "mae": 1947.58,
+      "rmse": 2467.47,
+      "bias": 1885.65
     },
     {
       "hour": 12,
       "count": 31,
-      "mae": 1800.65,
-      "rmse": 2174.53,
-      "bias": 1436.77
+      "mae": 1702.23,
+      "rmse": 2091.88,
+      "bias": 1338.35
     }
   ]
 }
@@ -215,30 +215,30 @@ Returns forecast accuracy segmented by lead time horizon bucket. Negative lead t
 
 ```json
 {
-  "start_date": "2026-01-01",
-  "end_date": "2026-01-31",
+  "start_date": "2026-01-02",
+  "end_date": "2026-02-01",
   "main_buckets": [
     {
       "horizon_bucket": "<12h",
       "count": 2976,
-      "mae": 1800.73,
-      "rmse": 2276.96,
-      "bias": 1582.17
+      "mae": 1688.64,
+      "rmse": 2148.90,
+      "bias": 1466.39
     },
     {
       "horizon_bucket": "12-18h",
       "count": 1488,
-      "mae": 1932.82,
-      "rmse": 2415.68,
-      "bias": 1739.88
+      "mae": 1824.11,
+      "rmse": 2299.18,
+      "bias": 1627.73
     }
   ],
   "after_target_bucket": {
     "horizon_bucket": "published_after_target",
     "count": 3697,
-    "mae": 1884.34,
-    "rmse": 2341.20,
-    "bias": 1753.40
+    "mae": 1785.36,
+    "rmse": 2244.60,
+    "bias": 1652.15
   },
   "buckets": [ ... ]
 }
@@ -249,11 +249,11 @@ Returns available date ranges, default cutoff time, database record counts, and 
 
 ```json
 {
-  "available_start_date": "2026-01-01",
-  "available_end_date": "2026-01-31",
+  "available_start_date": "2026-01-02",
+  "available_end_date": "2026-02-01",
   "default_cutoff_time": "12:00",
-  "actual_rows_count": 1488,
-  "forecast_rows_count": 18080,
+  "actual_rows_count": 1536,
+  "forecast_rows_count": 18664,
   "timezone": "Europe/London",
   "resolution_notes": {
     "actuals_resolution": "30-minute half-hourly outturns (FUELHH)",

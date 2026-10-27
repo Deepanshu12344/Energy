@@ -56,10 +56,10 @@ const MetricTile: React.FC<MetricTileProps> = ({
       )}
     </div>
 
-    <div className="flex items-center justify-between mt-0.5 text-[10px] sm:text-[11px]">
-      {subtext && <span className="text-slate-400 dark:text-[#737373] truncate">{subtext}</span>}
+    <div className="flex items-center justify-between mt-0.5 text-[10px] sm:text-[11px] min-h-[1.25rem]">
+      {subtext && <span className="text-slate-400 dark:text-[#737373] leading-tight line-clamp-2">{subtext}</span>}
       {badge && (
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-[#0B8FE3] dark:bg-blue-950/40 dark:text-[#86C5EE] border border-blue-100/60 dark:border-blue-900/30">
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-[#0B8FE3] dark:bg-[#1F1F1F] dark:text-[#86C5EE] border border-blue-100/60 dark:border-[#2A2A2A] shrink-0 ml-auto">
           {badge.text}
         </span>
       )}
@@ -95,7 +95,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           value={m.mae !== null ? m.mae.toLocaleString() : 'N/A'}
           unit="MW"
           tooltip="Mean Absolute Error: average magnitude of hourly errors regardless of direction."
-          subtext="Typical deviation"
+          subtext="Average miss size"
           isPreview={isPreview}
         />
 
@@ -105,7 +105,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           value={m.rmse !== null ? m.rmse.toLocaleString() : 'N/A'}
           unit="MW"
           tooltip="Root Mean Squared Error: penalizes large forecast misses more severely than MAE."
-          subtext="Typical error size; large misses weigh more"
+          subtext="Large misses weigh more"
           isPreview={isPreview}
         />
 
@@ -127,7 +127,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           label="MAPE"
           value={m.mape !== null ? `${m.mape}%` : 'N/A'}
           tooltip="Mean Absolute Percentage Error. Outturns under 10 MW are excluded to guard against division-by-zero spikes."
-          subtext={`${m.mape_excluded_count} hours excluded (actual < 10 MW)`}
+          subtext={`${m.mape_excluded_count} hours excluded (<10 MW)`}
           isPreview={isPreview}
         />
 
@@ -137,7 +137,7 @@ const MetricsPanelComponent: React.FC<MetricsPanelProps> = ({ isPreview = false 
           value={m.p95_abs_error !== null ? m.p95_abs_error.toLocaleString() : 'N/A'}
           unit="MW"
           tooltip="95th percentile absolute error: 95% of evaluated hourly misses were below this number."
-          subtext="Tail risk barrier"
+          subtext="Tail risk: 1 in 20 hours is worse"
           isPreview={isPreview}
         />
 

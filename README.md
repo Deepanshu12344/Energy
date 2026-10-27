@@ -47,13 +47,13 @@ Independent validation across all 744 hourly delivery intervals for January 2026
 
 ### Accuracy by Lead Time Horizon
 Evaluation of all 18,080 published forecasts in January 2026 demonstrates clear skill degradation as lead time increases (`GET /api/horizon-analysis`):
-* **$<12\text{ hours}$ lead time:** MAE = **1,800.73 MW** | RMSE = **2,276.96 MW** | Bias = **+1,582.17 MW**
-* **$12-18\text{ hours}$ lead time:** MAE = **1,932.82 MW** | RMSE = **2,415.68 MW** | Bias = **+1,739.88 MW**
-* **$18-24\text{ hours}$ lead time:** MAE = **2,048.95 MW** | RMSE = **2,531.31 MW** | Bias = **+1,882.53 MW**
-* **$24-36\text{ hours}$ lead time:** MAE = **2,122.56 MW** | RMSE = **2,586.87 MW** | Bias = **+1,838.48 MW**
-* **$36-48\text{ hours}$ lead time:** MAE = **2,337.01 MW** | RMSE = **2,866.21 MW** | Bias = **+2,004.50 MW**
-* **$>48\text{ hours}$ lead time:** MAE = **2,371.92 MW** | RMSE = **2,977.90 MW** | Bias = **+1,479.56 MW**
-* **Segregated Post-Target Bucket:** 3,697 forecast revisions published *after* the delivery target timestamp (negative lead time) are segregated (MAE: 1,884.34 MW, Bias: +1,753.40 MW) and excluded from forward horizons.
+* **$<12\text{ hours}$ lead time:** MAE = **1,688.64 MW** | RMSE = **2,148.90 MW** | Bias = **+1,466.39 MW**
+* **$12-18\text{ hours}$ lead time:** MAE = **1,824.11 MW** | RMSE = **2,299.18 MW** | Bias = **+1,627.73 MW**
+* **$18-24\text{ hours}$ lead time:** MAE = **1,936.52 MW** | RMSE = **2,417.16 MW** | Bias = **+1,768.27 MW**
+* **$24-36\text{ hours}$ lead time:** MAE = **2,004.17 MW** | RMSE = **2,474.05 MW** | Bias = **+1,719.06 MW**
+* **$36-48\text{ hours}$ lead time:** MAE = **2,233.83 MW** | RMSE = **2,775.89 MW** | Bias = **+1,900.10 MW**
+* **$>48\text{ hours}$ lead time:** MAE = **2,307.40 MW** | RMSE = **2,922.80 MW** | Bias = **+1,415.05 MW**
+* **Segregated Post-Target Bucket:** 3,697 forecast revisions published *after* the delivery target timestamp (negative lead time) are segregated (MAE: 1,785.36 MW, Bias: +1,652.15 MW) and excluded from forward horizons.
 
 ---
 
@@ -62,7 +62,7 @@ Evaluation of all 18,080 published forecasts in January 2026 demonstrates clear 
 All January 2026 data was pre-loaded into Supabase PostgreSQL during setup. **The deployed application never calls Elexon BMRS at runtime.**
 
 ### Why Pre-Load Data in Supabase?
-1. **Runtime Resilience & Zero External Dependencies:** Elexon BMRS Open APIs enforce strict rate limits, experience frequent maintenance outages, and add 1–4 seconds of network latency. Pre-loading guarantees `<25ms` response times.
+1. **Runtime Resilience & Zero External Dependencies:** Elexon BMRS Open APIs enforce strict rate limits, experience frequent maintenance outages, and add 1–4 seconds of network latency. Pre-loading ensures `<25ms` response times.
 2. **Deterministic Evaluation:** A trading benchmark must be frozen and reproducible. Live API queries risk upstream retroactive restatements corrupting historical auditability.
 3. **Cost & Scalability:** Serverless FastAPI workers can scale to handle arbitrary user load without risking external API quota bans.
 

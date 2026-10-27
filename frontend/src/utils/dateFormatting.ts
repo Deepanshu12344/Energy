@@ -99,3 +99,51 @@ export function getScopeBadge(
   const count = getDayCountInclusive(startDate, endDate);
   return `${formatDayMonth(startDate)} to ${formatDayMonth(endDate)} (${count} days)`;
 }
+
+/**
+ * Format settlement slot timestamp for Data Table:
+ * - Single-day mode: '00:00', '00:30'
+ * - Multi-day range: '15 Jan 00:00'
+ */
+export function formatSlotTime(startTimeStr: string, isMultiDay: boolean): string {
+  if (!startTimeStr) return '—';
+  try {
+    const d = new Date(startTimeStr);
+    if (!isNaN(d.getTime())) {
+      const hours = String(d.getUTCHours()).padStart(2, '0');
+      const mins = String(d.getUTCMinutes()).padStart(2, '0');
+      const timeOnly = `${hours}:${mins}`;
+      if (!isMultiDay) {
+        return timeOnly;
+      }
+      const day = d.getUTCDate();
+      const month = MONTHS[d.getUTCMonth()];
+      return `${day} ${month} ${timeOnly}`;
+    }
+  } catch {
+    // Fallback to substring
+  }
+
+  // Fallback string slicing if Date parsing fails
+  const timePart = startTimeStr.slice(11, 16) || startTimeStr;
+  if (!isMultiDay) return timePart;
+  const datePart = startTimeStr.slice(0, 10);
+  return `${formatDayMonth(datePart)} ${timePart}`.trim();
+}
+
+/**
+ * Natural language scope phrase for Decision Support and captions:
+ * - Single-day: 'on 15 Jan'
+ * - Multi-day range: 'between 2 Jan and 1 Feb'
+ */
+export function getScopePhrase(
+  rangeMode: 'single' | 'full' | 'custom',
+  singleDate: string,
+  startDate: string,
+  endDate: string
+): string {
+  if (rangeMode === 'single') {
+    return `on ${formatDayMonth(singleDate)}`;
+  }
+  return `between ${formatDayMonth(startDate)} and ${formatDayMonth(endDate)}`;
+}

@@ -136,7 +136,7 @@ const PanelShellComponent: React.FC<PanelShellProps> = ({
             </div>
           ) : (
             /* Explicit scope badge in every other panel */
-            <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/50 text-[#0B8FE3] dark:text-[#86C5EE] border border-blue-100 dark:border-blue-900/40 shrink-0">
+            <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 dark:bg-[#1F1F1F] text-[#0B8FE3] dark:text-[#86C5EE] border border-blue-100/60 dark:border-[#2A2A2A] shrink-0">
               {scopeBadgeText}
             </span>
           )}
@@ -152,7 +152,7 @@ const PanelShellComponent: React.FC<PanelShellProps> = ({
               title={isSearchOpen ? 'Close search' : 'Search table'}
               className={`p-1.5 rounded-md transition-colors ${
                 isSearchOpen
-                  ? 'bg-blue-50 dark:bg-blue-950/50 text-[#0B8FE3]'
+                  ? 'bg-blue-50 dark:bg-[#1F1F1F] text-[#0B8FE3] dark:text-[#86C5EE]'
                   : 'text-slate-400 hover:text-slate-700 dark:text-[#A3A3A3] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1F1F1F]'
               }`}
             >
@@ -234,7 +234,7 @@ const PanelShellComponent: React.FC<PanelShellProps> = ({
             <button
               type="button"
               onClick={() => refetchPanel(id)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-[#0B8FE3] hover:bg-blue-100 dark:hover:bg-blue-900/60 font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-[#1F1F1F] text-[#0B8FE3] dark:text-[#86C5EE] border border-blue-100 dark:border-[#2A2A2A] hover:bg-blue-100 dark:hover:bg-[#2A2A2A] font-medium transition-colors"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Retry</span>

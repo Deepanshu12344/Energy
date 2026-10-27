@@ -60,14 +60,14 @@ flowchart TD
 
 ### ADR-4: Stateless Pure Services Layer
 * **Decision:** All mathematical calculations, timezone conversions, and metric evaluations are implemented as pure Python functions in `backend/app/services/` that take standard primitives and return typed dataclasses/schemas.
-* **Rationale:** Ensures 100% testability without database mocks, guarantees zero I/O side effects, and keeps database queries purely focused on data retrieval.
+* **Rationale:** Ensures 100% testability without database mocks, ensures zero I/O side effects, and keeps database queries purely focused on data retrieval.
 
 ### ADR-5: Serverless-Resilient Database Connection Pooling
 * **Decision:**
   - Configured `psycopg_pool.ConnectionPool` with `min_size=0, max_size=2, timeout=10.0, prepare_threshold=None`.
   - Lazy pool initialization upon first query checkout, avoiding startup deadlocks during cold starts.
   - Fully compatible with Supabase's transaction pooler (PgBouncer, port 6543) and session pooler (port 5432).
-* **Rationale:** Serverless platforms (such as Vercel) dynamically freeze and spin up instances. Holding idle persistent connections (`min_size > 0`) exhausts PostgreSQL connection pools; prepared statements fail under transaction poolers. Setting `min_size=0` and `prepare_threshold=None` guarantees zero connection leaks.
+* **Rationale:** Serverless platforms (such as Vercel) dynamically freeze and spin up instances. Holding idle persistent connections (`min_size > 0`) exhausts PostgreSQL connection pools; prepared statements fail under transaction poolers. Setting `min_size=0` and `prepare_threshold=None` ensures zero connection leaks.
 
 ---
 
@@ -108,6 +108,6 @@ CREATE INDEX idx_wind_forecasts_cutoff ON wind_forecasts (start_time, publish_ti
 When walking through the architecture in the technical presentation:
 1. **The Energy Trading Problem:** Highlight why a day-ahead wind buyer cannot simply look at a single forecast—National Grid revises forecasts continuously. A buyer must freeze their view at **12:00 London on Day D-1** (gate closure) and quantify the volumetric risk.
 2. **The 3-Tier Pipeline:** Show the Mermaid diagram demonstrating how ingestion pre-populates Supabase, how FastAPI serves pure statistical metrics, and how the React SPA renders interactive curves without business logic.
-3. **The +1,806 MW Bias Story:** Point out that forecasts systematically over-predicted wind generation on **29 of 31 days (93.5%)** and in **78.9% of hours**. Explain why this means unhedged buyers face cash-out imbalance penalties.
-4. **The P90 Buffer Metric:** Explain that 90% of hourly errors fell within **4,000 MW**, giving procurement managers an objective operational buffer.
+3. **The +1,685 MW Bias Story:** Point out that forecasts systematically over-predicted wind generation on **29 of 31 days (93.5%)** and in **85.0% of hours** (+1,685.27 MW mean bias). Explain why this means unhedged buyers face cash-out imbalance penalties.
+4. **The P90 Buffer Metric:** Explain that 90% of hourly errors fell within **3,768 MW**, giving procurement managers an objective operational buffer.
 5. **Production Hardening:** Highlight the `min_size=0` connection pooling for serverless cold-start resilience, multi-stage Docker builds, code-split frontend bundles, and 94% automated test coverage.

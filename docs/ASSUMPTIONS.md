@@ -6,8 +6,8 @@ This document records the operational, technical, and domain assumptions governi
 
 ## 1. Domain & Scope Assumptions
 
-1. **Delivery Scope (January 2026):**
-   - The analysis is scoped strictly to delivery days in January 2026 (`2026-01-01` to `2026-01-31`).
+1. **Delivery Scope (January 2026 Purchase Decisions):**
+   - The analysis is scoped strictly to purchase decisions made in January 2026 (1 Jan to 31 Jan), which correspond to day-ahead delivery days **2026-01-02 through 2026-02-01** (31 delivery days, 744 hourly settlement intervals).
    - Forecast publication records are fetched with a lead margin starting on `2025-12-24T00:00:00Z` to ensure all day-ahead forecasts for early January delivery days (which are published in late December) are available.
 
 2. **Decision Cutoff Time (D-1 Gate Closure):**

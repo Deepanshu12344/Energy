@@ -42,7 +42,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
         <span
           className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
             data.status === 'forecast_selected'
-              ? 'bg-blue-50 text-[#0B8FE3] dark:bg-blue-950/60 dark:text-[#86C5EE]'
+              ? 'bg-blue-50 text-[#0B8FE3] dark:bg-[#2A2A2A] dark:text-[#86C5EE]'
               : data.status === 'missing'
               ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300'
               : 'bg-slate-100 text-slate-500 dark:bg-[#2A2A2A] dark:text-[#A3A3A3]'

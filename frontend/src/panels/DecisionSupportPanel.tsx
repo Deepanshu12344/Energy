@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { ShieldAlert, TrendingUp, Info } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
-import { formatDayMonth } from '../utils/dateFormatting';
+import { formatDayMonth, getScopePhrase } from '../utils/dateFormatting';
 
 interface DecisionSupportPanelProps {
   isPreview?: boolean;
@@ -26,6 +26,8 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
     dist?.over_forecast_share !== null && dist?.over_forecast_share !== undefined
       ? (dist.over_forecast_share * 100).toFixed(1)
       : null;
+
+  const scopePhrase = getScopePhrase(rangeMode, singleDate, effectiveRange.start, effectiveRange.end);
 
   const bufferPrefix =
     rangeMode === 'single'
@@ -62,7 +64,7 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
       {/* Systematic Bias Observation Card */}
       <div className="bg-slate-50 dark:bg-[#1A1A1A] rounded-xl p-4 border border-slate-100 dark:border-[#2A2A2A] flex-1 flex flex-col justify-center">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg shrink-0 mt-0.5 bg-blue-100 dark:bg-blue-950/60 text-[#0B8FE3]">
+          <div className="p-2 rounded-lg shrink-0 mt-0.5 bg-blue-100 dark:bg-[#1F1F1F] text-[#0B8FE3] dark:border dark:border-[#2A2A2A]">
             <TrendingUp className="w-4 h-4" />
           </div>
           <div className="text-xs text-slate-600 dark:text-[#A3A3A3] space-y-1">
@@ -80,7 +82,7 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
                   <strong className="text-slate-900 dark:text-white font-semibold">
                     {overSharePct ? `${overSharePct}%` : 'most'}
                   </strong>{' '}
-                  of evaluated hours during {effectiveRange.label.toLowerCase()}.
+                  of evaluated hours {scopePhrase}.
                 </>
               ) : biasVal < 0 ? (
                 <>
@@ -101,7 +103,7 @@ const DecisionSupportPanelComponent: React.FC<DecisionSupportPanelProps> = ({ is
       {!isPreview && (
         <div className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-[#737373] pt-1">
           <Info className="w-3 h-3 text-slate-400 dark:text-[#737373] shrink-0" />
-          <span>Based on {m.evaluated_slots} evaluated settlement slots at {metrics?.cutoff_time} cutoff.</span>
+          <span>Based on {m.evaluated_slots} evaluated settlement slots {scopePhrase} at {metrics?.cutoff_time} cutoff.</span>
         </div>
       )}
     </div>
